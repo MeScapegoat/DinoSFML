@@ -7,7 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include(CTest)
 enable_testing()
 
-add_executable(DinoSFML main.cpp)
+file(GLOB SOURCES
+    ./*.h
+    ./*.cpp
+)
+
+
+add_executable(DinoSFML ${SOURCES})
 
 target_link_libraries(DinoSFML PRIVATE sfml-system)
 target_link_libraries(DinoSFML PRIVATE sfml-window)

@@ -1,4 +1,4 @@
-CMakeFiles/DinoSFML.dir/main.cpp.o: /media/sf_C++_codes/DinoSFML/main.cpp \
+CMakeFiles/DinoSFML.dir/Game.cpp.o: /media/sf_C++_codes/DinoSFML/Game.cpp \
  /usr/include/stdc-predef.h /media/sf_C++_codes/DinoSFML/Game.h \
  /usr/include/SFML/Graphics.hpp /usr/include/SFML/Window.hpp \
  /usr/include/SFML/System.hpp /usr/include/SFML/Config.hpp \

@@ -1,6 +1,12 @@
 [
 {
   "directory": "/media/sf_C++_codes/DinoSFML/build",
+  "command": "/usr/bin/g++ -DSFML_STATIC  -g -std=gnu++11 -o CMakeFiles/DinoSFML.dir/Game.cpp.o -c /media/sf_C++_codes/DinoSFML/Game.cpp",
+  "file": "/media/sf_C++_codes/DinoSFML/Game.cpp",
+  "output": "CMakeFiles/DinoSFML.dir/Game.cpp.o"
+},
+{
+  "directory": "/media/sf_C++_codes/DinoSFML/build",
   "command": "/usr/bin/g++ -DSFML_STATIC  -g -std=gnu++11 -o CMakeFiles/DinoSFML.dir/main.cpp.o -c /media/sf_C++_codes/DinoSFML/main.cpp",
   "file": "/media/sf_C++_codes/DinoSFML/main.cpp",
   "output": "CMakeFiles/DinoSFML.dir/main.cpp.o"

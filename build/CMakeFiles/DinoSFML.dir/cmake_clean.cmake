@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/DinoSFML.dir/Game.cpp.o"
+  "CMakeFiles/DinoSFML.dir/Game.cpp.o.d"
   "CMakeFiles/DinoSFML.dir/main.cpp.o"
   "CMakeFiles/DinoSFML.dir/main.cpp.o.d"
   "DinoSFML"

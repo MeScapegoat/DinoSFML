@@ -1,1 +1,1 @@
-/usr/bin/g++ -g CMakeFiles/DinoSFML.dir/main.cpp.o -o DinoSFML  -lsfml-system -lsfml-window -lsfml-graphics -lsfml-audio -lsfml-network 
+/usr/bin/g++ -g CMakeFiles/DinoSFML.dir/Game.cpp.o CMakeFiles/DinoSFML.dir/main.cpp.o -o DinoSFML  -lsfml-system -lsfml-window -lsfml-graphics -lsfml-audio -lsfml-network 
