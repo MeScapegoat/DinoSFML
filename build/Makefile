@@ -523,6 +523,54 @@ DinoSFML/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/build
 .PHONY : DinoSFML/fast
 
+Background.o: Background.cpp.o
+.PHONY : Background.o
+
+# target to build an object file
+Background.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Background.cpp.o
+.PHONY : Background.cpp.o
+
+Background.i: Background.cpp.i
+.PHONY : Background.i
+
+# target to preprocess a source file
+Background.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Background.cpp.i
+.PHONY : Background.cpp.i
+
+Background.s: Background.cpp.s
+.PHONY : Background.s
+
+# target to generate assembly for a file
+Background.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Background.cpp.s
+.PHONY : Background.cpp.s
+
+Enemy.o: Enemy.cpp.o
+.PHONY : Enemy.o
+
+# target to build an object file
+Enemy.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Enemy.cpp.o
+.PHONY : Enemy.cpp.o
+
+Enemy.i: Enemy.cpp.i
+.PHONY : Enemy.i
+
+# target to preprocess a source file
+Enemy.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Enemy.cpp.i
+.PHONY : Enemy.cpp.i
+
+Enemy.s: Enemy.cpp.s
+.PHONY : Enemy.s
+
+# target to generate assembly for a file
+Enemy.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Enemy.cpp.s
+.PHONY : Enemy.cpp.s
+
 Game.o: Game.cpp.o
 .PHONY : Game.o
 
@@ -546,6 +594,30 @@ Game.s: Game.cpp.s
 Game.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Game.cpp.s
 .PHONY : Game.cpp.s
+
+Model.o: Model.cpp.o
+.PHONY : Model.o
+
+# target to build an object file
+Model.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Model.cpp.o
+.PHONY : Model.cpp.o
+
+Model.i: Model.cpp.i
+.PHONY : Model.i
+
+# target to preprocess a source file
+Model.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Model.cpp.i
+.PHONY : Model.cpp.i
+
+Model.s: Model.cpp.s
+.PHONY : Model.s
+
+# target to generate assembly for a file
+Model.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/Model.cpp.s
+.PHONY : Model.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -611,9 +683,18 @@ help:
 	@echo "... NightlyTest"
 	@echo "... NightlyUpdate"
 	@echo "... DinoSFML"
+	@echo "... Background.o"
+	@echo "... Background.i"
+	@echo "... Background.s"
+	@echo "... Enemy.o"
+	@echo "... Enemy.i"
+	@echo "... Enemy.s"
 	@echo "... Game.o"
 	@echo "... Game.i"
 	@echo "... Game.s"
+	@echo "... Model.o"
+	@echo "... Model.i"
+	@echo "... Model.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

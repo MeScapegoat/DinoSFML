@@ -6,5 +6,5 @@ CXX_DEFINES = -DSFML_STATIC
 
 CXX_INCLUDES = 
 
-CXX_FLAGS = -g -std=gnu++11
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++11
 

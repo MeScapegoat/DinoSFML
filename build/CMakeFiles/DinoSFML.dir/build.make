@@ -69,10 +69,38 @@ include CMakeFiles/DinoSFML.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/DinoSFML.dir/flags.make
 
+CMakeFiles/DinoSFML.dir/Background.cpp.o: CMakeFiles/DinoSFML.dir/flags.make
+CMakeFiles/DinoSFML.dir/Background.cpp.o: /media/sf_C++_codes/DinoSFML/Background.cpp
+CMakeFiles/DinoSFML.dir/Background.cpp.o: CMakeFiles/DinoSFML.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/DinoSFML.dir/Background.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/DinoSFML.dir/Background.cpp.o -MF CMakeFiles/DinoSFML.dir/Background.cpp.o.d -o CMakeFiles/DinoSFML.dir/Background.cpp.o -c /media/sf_C++_codes/DinoSFML/Background.cpp
+
+CMakeFiles/DinoSFML.dir/Background.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DinoSFML.dir/Background.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/sf_C++_codes/DinoSFML/Background.cpp > CMakeFiles/DinoSFML.dir/Background.cpp.i
+
+CMakeFiles/DinoSFML.dir/Background.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DinoSFML.dir/Background.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/sf_C++_codes/DinoSFML/Background.cpp -o CMakeFiles/DinoSFML.dir/Background.cpp.s
+
+CMakeFiles/DinoSFML.dir/Enemy.cpp.o: CMakeFiles/DinoSFML.dir/flags.make
+CMakeFiles/DinoSFML.dir/Enemy.cpp.o: /media/sf_C++_codes/DinoSFML/Enemy.cpp
+CMakeFiles/DinoSFML.dir/Enemy.cpp.o: CMakeFiles/DinoSFML.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/DinoSFML.dir/Enemy.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/DinoSFML.dir/Enemy.cpp.o -MF CMakeFiles/DinoSFML.dir/Enemy.cpp.o.d -o CMakeFiles/DinoSFML.dir/Enemy.cpp.o -c /media/sf_C++_codes/DinoSFML/Enemy.cpp
+
+CMakeFiles/DinoSFML.dir/Enemy.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DinoSFML.dir/Enemy.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/sf_C++_codes/DinoSFML/Enemy.cpp > CMakeFiles/DinoSFML.dir/Enemy.cpp.i
+
+CMakeFiles/DinoSFML.dir/Enemy.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DinoSFML.dir/Enemy.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/sf_C++_codes/DinoSFML/Enemy.cpp -o CMakeFiles/DinoSFML.dir/Enemy.cpp.s
+
 CMakeFiles/DinoSFML.dir/Game.cpp.o: CMakeFiles/DinoSFML.dir/flags.make
 CMakeFiles/DinoSFML.dir/Game.cpp.o: /media/sf_C++_codes/DinoSFML/Game.cpp
 CMakeFiles/DinoSFML.dir/Game.cpp.o: CMakeFiles/DinoSFML.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/DinoSFML.dir/Game.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/DinoSFML.dir/Game.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/DinoSFML.dir/Game.cpp.o -MF CMakeFiles/DinoSFML.dir/Game.cpp.o.d -o CMakeFiles/DinoSFML.dir/Game.cpp.o -c /media/sf_C++_codes/DinoSFML/Game.cpp
 
 CMakeFiles/DinoSFML.dir/Game.cpp.i: cmake_force
@@ -83,10 +111,24 @@ CMakeFiles/DinoSFML.dir/Game.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DinoSFML.dir/Game.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/sf_C++_codes/DinoSFML/Game.cpp -o CMakeFiles/DinoSFML.dir/Game.cpp.s
 
+CMakeFiles/DinoSFML.dir/Model.cpp.o: CMakeFiles/DinoSFML.dir/flags.make
+CMakeFiles/DinoSFML.dir/Model.cpp.o: /media/sf_C++_codes/DinoSFML/Model.cpp
+CMakeFiles/DinoSFML.dir/Model.cpp.o: CMakeFiles/DinoSFML.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/DinoSFML.dir/Model.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/DinoSFML.dir/Model.cpp.o -MF CMakeFiles/DinoSFML.dir/Model.cpp.o.d -o CMakeFiles/DinoSFML.dir/Model.cpp.o -c /media/sf_C++_codes/DinoSFML/Model.cpp
+
+CMakeFiles/DinoSFML.dir/Model.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DinoSFML.dir/Model.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/sf_C++_codes/DinoSFML/Model.cpp > CMakeFiles/DinoSFML.dir/Model.cpp.i
+
+CMakeFiles/DinoSFML.dir/Model.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DinoSFML.dir/Model.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/sf_C++_codes/DinoSFML/Model.cpp -o CMakeFiles/DinoSFML.dir/Model.cpp.s
+
 CMakeFiles/DinoSFML.dir/main.cpp.o: CMakeFiles/DinoSFML.dir/flags.make
 CMakeFiles/DinoSFML.dir/main.cpp.o: /media/sf_C++_codes/DinoSFML/main.cpp
 CMakeFiles/DinoSFML.dir/main.cpp.o: CMakeFiles/DinoSFML.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/DinoSFML.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/DinoSFML.dir/main.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/DinoSFML.dir/main.cpp.o -MF CMakeFiles/DinoSFML.dir/main.cpp.o.d -o CMakeFiles/DinoSFML.dir/main.cpp.o -c /media/sf_C++_codes/DinoSFML/main.cpp
 
 CMakeFiles/DinoSFML.dir/main.cpp.i: cmake_force
@@ -99,17 +141,23 @@ CMakeFiles/DinoSFML.dir/main.cpp.s: cmake_force
 
 # Object files for target DinoSFML
 DinoSFML_OBJECTS = \
+"CMakeFiles/DinoSFML.dir/Background.cpp.o" \
+"CMakeFiles/DinoSFML.dir/Enemy.cpp.o" \
 "CMakeFiles/DinoSFML.dir/Game.cpp.o" \
+"CMakeFiles/DinoSFML.dir/Model.cpp.o" \
 "CMakeFiles/DinoSFML.dir/main.cpp.o"
 
 # External object files for target DinoSFML
 DinoSFML_EXTERNAL_OBJECTS =
 
+DinoSFML: CMakeFiles/DinoSFML.dir/Background.cpp.o
+DinoSFML: CMakeFiles/DinoSFML.dir/Enemy.cpp.o
 DinoSFML: CMakeFiles/DinoSFML.dir/Game.cpp.o
+DinoSFML: CMakeFiles/DinoSFML.dir/Model.cpp.o
 DinoSFML: CMakeFiles/DinoSFML.dir/main.cpp.o
 DinoSFML: CMakeFiles/DinoSFML.dir/build.make
 DinoSFML: CMakeFiles/DinoSFML.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable DinoSFML"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable DinoSFML"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/DinoSFML.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

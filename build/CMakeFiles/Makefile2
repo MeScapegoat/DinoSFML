@@ -837,12 +837,12 @@ CMakeFiles/ContinuousSubmit.dir/clean:
 CMakeFiles/DinoSFML.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/DinoSFML.dir/build.make CMakeFiles/DinoSFML.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=1,2,3 "Built target DinoSFML"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/media/sf_C++_codes/DinoSFML/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target DinoSFML"
 .PHONY : CMakeFiles/DinoSFML.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/DinoSFML.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /media/sf_C++_codes/DinoSFML/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/sf_C++_codes/DinoSFML/build/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/DinoSFML.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /media/sf_C++_codes/DinoSFML/build/CMakeFiles 0
 .PHONY : CMakeFiles/DinoSFML.dir/rule

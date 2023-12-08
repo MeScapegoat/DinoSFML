@@ -1,11 +1,11 @@
-CMakeFiles/DinoSFML.dir/main.cpp.o: /media/sf_C++_codes/DinoSFML/main.cpp \
- /usr/include/stdc-predef.h /media/sf_C++_codes/DinoSFML/Game.h \
- /usr/include/SFML/Graphics.hpp /usr/include/SFML/Window.hpp \
- /usr/include/SFML/System.hpp /usr/include/SFML/Config.hpp \
- /usr/include/SFML/System/Clock.hpp /usr/include/SFML/System/Export.hpp \
- /usr/include/SFML/System/Time.hpp /usr/include/SFML/System/Err.hpp \
- /usr/include/c++/11/ostream /usr/include/c++/11/ios \
- /usr/include/c++/11/iosfwd \
+CMakeFiles/DinoSFML.dir/Background.cpp.o: \
+ /media/sf_C++_codes/DinoSFML/Background.cpp /usr/include/stdc-predef.h \
+ /media/sf_C++_codes/DinoSFML/Background.h /usr/include/SFML/Graphics.hpp \
+ /usr/include/SFML/Window.hpp /usr/include/SFML/System.hpp \
+ /usr/include/SFML/Config.hpp /usr/include/SFML/System/Clock.hpp \
+ /usr/include/SFML/System/Export.hpp /usr/include/SFML/System/Time.hpp \
+ /usr/include/SFML/System/Err.hpp /usr/include/c++/11/ostream \
+ /usr/include/c++/11/ios /usr/include/c++/11/iosfwd \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -231,8 +231,5 @@ CMakeFiles/DinoSFML.dir/main.cpp.o: /media/sf_C++_codes/DinoSFML/main.cpp \
  /usr/include/SFML/Graphics/Glsl.hpp /usr/include/SFML/Graphics/Glsl.inl \
  /usr/include/SFML/Graphics/Sprite.hpp \
  /usr/include/SFML/Graphics/Text.hpp \
- /usr/include/SFML/Graphics/VertexBuffer.hpp /usr/include/c++/11/deque \
- /usr/include/c++/11/bits/stl_deque.h /usr/include/c++/11/bits/deque.tcc \
- /media/sf_C++_codes/DinoSFML/Background.h \
- /media/sf_C++_codes/DinoSFML/Model.h \
- /media/sf_C++_codes/DinoSFML/Enemy.h
+ /usr/include/SFML/Graphics/VertexBuffer.hpp \
+ /media/sf_C++_codes/DinoSFML/Model.h
