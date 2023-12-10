@@ -1,3 +1,4 @@
+#pragma once
 #include <SFML/Graphics.hpp>
 
 #include "Model.h"
@@ -44,7 +45,7 @@ private:
     sf::Vector2u windowSize;
 
     float groundHeight{windowSize.y * 0.7f}; // How far is the "ground", on which the player running
-    sf::Vector2f roadSize{windowSize.x, windowSize.y * 0.05f};
+    sf::Vector2f roadSize{static_cast<float>(windowSize.x), windowSize.y * 0.05f};
     Model road{roadSize};
 
     int cloudsAmount{6};

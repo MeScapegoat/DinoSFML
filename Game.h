@@ -1,10 +1,10 @@
+#pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 
 #include <deque>
 
 #include "Background.h"
-#include "Enemy.h"
 
 class Game
 {
@@ -30,6 +30,7 @@ private:
     sf::Event event;
     Background background;
     sf::Vector2f velocity;
-    // ? player
-    // Enemy enemy;
+    std::vector<Model> groundEnemies;
+    std::vector<Model> flyingEnemies;
+    Model player;
 };

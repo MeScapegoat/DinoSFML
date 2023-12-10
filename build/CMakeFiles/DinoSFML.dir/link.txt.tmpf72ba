@@ -1,1 +1,0 @@
-/usr/bin/g++ -g CMakeFiles/DinoSFML.dir/main.cpp.o -o DinoSFML  -llsfml-graphics -lsfml-graphics -lsfml-graphics 
