@@ -2,9 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 
-#include <deque>
-
 #include "Background.h"
+#include "Enemies.h"
 
 class Game
 {
@@ -24,13 +23,17 @@ public:
     void render();
     void run();
 
+public:
 private:
+    int type = 1;
     sf::Clock clock;
+    float elapsedTime;
+    float timePassed;
+    float spawnInterval;
     sf::RenderWindow window;
     sf::Event event;
     Background background;
     sf::Vector2f velocity;
-    std::vector<Model> groundEnemies;
-    std::vector<Model> flyingEnemies;
     Model player;
+    Enemies enemies;
 };

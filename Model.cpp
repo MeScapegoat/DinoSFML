@@ -3,6 +3,7 @@
 Model::Model(const sf::Vector2f &size) : rect(size)
 {
     rect.setOrigin(sf::Vector2f(size.x / 2, size.y / 2));
+    rect.setPosition(0, 0);
 }
 
 Model::~Model() {}

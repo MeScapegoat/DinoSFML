@@ -4,12 +4,13 @@
 class Model
 {
 public:
+    Model();
     Model(const sf::Vector2f &);
-    virtual ~Model();
+    ~Model();
 
 public:
     void draw(sf::RenderWindow &) const;
-    virtual void move(const sf::Vector2f &);
+    void move(const sf::Vector2f &);
     void setPosition(const sf::Vector2f &);
     const sf::Vector2f &getPosition() const;
     void setColor(const sf::Color &);

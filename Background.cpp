@@ -17,7 +17,7 @@ void Background::init()
         cloud.setPosition(position);
         offset.y *= -1;
         position += offset;
-        clouds.push_back(cloud);
+        clouds.push_back(std::move(cloud));
     }
 
     trees.clear();
@@ -30,8 +30,9 @@ void Background::init()
         tree.setColor(sf::Color(150, 75, 0));
         tree.setPosition(position);
         position += offset;
-        trees.push_back(tree);
+        trees.push_back(std::move(tree));
     }
+
     road.setPosition(sf::Vector2f(windowSize.x / 2, groundHeight));
 }
 

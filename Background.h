@@ -1,8 +1,5 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-
 #include "Model.h"
-
 #include <vector>
 
 class Background
