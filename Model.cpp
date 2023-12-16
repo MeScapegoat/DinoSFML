@@ -37,3 +37,9 @@ const sf::Vector2f &Model::getSize() const
 {
     return rect.getSize();
 }
+
+void Model::setSize(const sf::Vector2f &size)
+{
+    rect.setSize(size);
+    rect.setOrigin(size.x / 2, size.y / 2);
+}

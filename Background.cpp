@@ -1,68 +1,85 @@
 #include "Background.h"
 
-Background::Background(const sf::Vector2u &windowSize) : windowSize(windowSize) {}
+#include <iostream>
+
+Background::Background(const sf::Vector2u &windowSize)
+    : windowSize(windowSize),
+      road(sf::Vector2f(0, 0)) {}
 
 Background::~Background() {}
 
 void Background::init()
 {
+    road.setSize(roadSize);
+    road.setPosition(sf::Vector2f(windowSize.x / 2, groundHeight));
+
     clouds.clear();
+    distBetweenClouds.x = static_cast<float>(windowSize.x) / cloudsAmount;
+    cloudsAmount += 1;
     clouds.reserve(cloudsAmount);
-    auto position = sf::Vector2f(cloudSize.x / 2, windowSize.y * 0.2f);
-    auto offset = sf::Vector2f(windowSize.x / (cloudsAmount - 1), windowSize.y * 0.1f);
+    distBetweenClouds.y = windowSize.y * 0.1f;
+    nextCloudPosition = sf::Vector2f(cloudSize.x / 2, windowSize.y * 0.2f);
     for (auto n = 0; n < cloudsAmount; ++n)
     {
         Model cloud(cloudSize);
         cloud.setColor(sf::Color::Blue);
-        cloud.setPosition(position);
-        offset.y *= -1;
-        position += offset;
+        cloud.setPosition(nextCloudPosition);
+        nextCloudPosition += distBetweenClouds;
+        distBetweenClouds.y *= -1;
         clouds.push_back(std::move(cloud));
     }
 
     trees.clear();
+    distBetweenTrees.x = static_cast<float>(windowSize.x) / treesAmount;
+    treesAmount += 1;
     trees.reserve(treesAmount);
-    position = sf::Vector2f(treeSize.x / 2, groundHeight - treeSize.y / 2);
-    offset = sf::Vector2f(windowSize.x / (treesAmount - 1), 0);
+    nextTreePosition = sf::Vector2f(treeSize.x / 2, groundHeight - treeSize.y / 2);
     for (auto n = 0; n < treesAmount; ++n)
     {
         Model tree(treeSize);
         tree.setColor(sf::Color(150, 75, 0));
-        tree.setPosition(position);
-        position += offset;
+        tree.setPosition(nextTreePosition);
+        nextTreePosition += distBetweenTrees;
         trees.push_back(std::move(tree));
     }
-
-    road.setPosition(sf::Vector2f(windowSize.x / 2, groundHeight));
 }
 
-void Background::draw(sf::RenderWindow &window)
+void Background::draw(sf::RenderWindow &window) const
 {
     for (const auto &cloud : clouds)
         cloud.draw(window);
+
     for (const auto &tree : trees)
         tree.draw(window);
+
     road.draw(window);
 }
 
-void Background::update(const sf::Vector2f &velocity) {}
-
 void Background::move(const sf::Vector2f &offset)
 {
+    nextCloudPosition += offset;
+    nextTreePosition += offset;
     for (auto &cloud : clouds)
     {
-        if (cloud.getPosition().x + cloud.getSize().x / 2 + offset.x > 0)
+        if (cloud.getPosition().x + cloud.getSize().x / 2 > 0)
             cloud.move(offset);
         else
-            cloud.setPosition(sf::Vector2f(windowSize.x - cloud.getSize().x / 2 + (windowSize.x / (cloudsAmount - 1)), cloud.getPosition().y));
+        {
+            cloud.setPosition(nextCloudPosition);
+            nextCloudPosition += distBetweenClouds;
+            distBetweenClouds.y *= -1;
+        }
     }
 
     for (auto &tree : trees)
     {
-        if (tree.getPosition().x + tree.getSize().x / 2 + offset.x > 0)
+        if (tree.getPosition().x + tree.getSize().x / 2 > 0)
             tree.move(offset);
         else
-            tree.setPosition(sf::Vector2f(windowSize.x - tree.getSize().x / 2 + windowSize.x / (treesAmount - 1), tree.getPosition().y));
+        {
+            tree.setPosition(nextTreePosition);
+            nextTreePosition += distBetweenTrees;
+        }
     }
 }
 
@@ -71,14 +88,14 @@ void Background::setGroundHeight(float newground)
     groundHeight = newground;
 }
 
-float Background::getGroundHeight()
+float Background::getGroundHeight() const
 {
     return groundHeight;
 }
 
-void Background::setRoadSize(sf::Vector2f size)
+void Background::setRoadSize(const sf::Vector2f &size)
 {
-    roadSize = std::move(size);
+    roadSize = size;
 }
 
 const sf::Vector2f &Background::getRoadSize() const
@@ -91,14 +108,14 @@ void Background::setCloudsAmount(int amount)
     cloudsAmount = amount;
 }
 
-int Background::getCloudsAmount()
+int Background::getCloudsAmount() const
 {
     return cloudsAmount;
 }
 
-void Background::setCloudSize(sf::Vector2f size)
+void Background::setCloudSize(const sf::Vector2f &size)
 {
-    cloudSize = std::move(size);
+    cloudSize = size;
 }
 
 const sf::Vector2f &Background::getCloudSize() const
@@ -111,14 +128,14 @@ void Background::setTreesAmount(int amount)
     treesAmount = amount;
 }
 
-int Background::getTreesAmount()
+int Background::getTreesAmount() const
 {
     return treesAmount;
 }
 
-void Background::setTreeSize(sf::Vector2f size)
+void Background::setTreeSize(const sf::Vector2f &size)
 {
-    treeSize = std::move(size);
+    treeSize = size;
 }
 
 const sf::Vector2f &Background::getTreeSize() const

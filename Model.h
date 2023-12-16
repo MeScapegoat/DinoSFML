@@ -6,15 +6,16 @@ class Model
 public:
     Model();
     Model(const sf::Vector2f &);
-    ~Model();
+    virtual ~Model();
 
 public:
-    void draw(sf::RenderWindow &) const;
-    void move(const sf::Vector2f &);
-    void setPosition(const sf::Vector2f &);
-    const sf::Vector2f &getPosition() const;
-    void setColor(const sf::Color &);
-    const sf::Vector2f &getSize() const;
+    virtual void draw(sf::RenderWindow &) const;
+    virtual void move(const sf::Vector2f &);
+    virtual void setPosition(const sf::Vector2f &);
+    virtual const sf::Vector2f &getPosition() const;
+    virtual void setColor(const sf::Color &);
+    virtual const sf::Vector2f &getSize() const;
+    virtual void setSize(const sf::Vector2f &);
 
 private:
     sf::RectangleShape rect;

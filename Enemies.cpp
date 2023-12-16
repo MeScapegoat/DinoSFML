@@ -48,7 +48,7 @@ void Enemies::move(const sf::Vector2f &offset)
     for (auto it = BusyGroundEnemies.begin(); it < BusyGroundEnemies.end(); ++it)
     {
         auto groundEnemyP = *it;
-        if (groundEnemyP->getPosition().x + offset.x + groundEnemyP->getSize().x / 2 <= 0)
+        if (groundEnemyP->getPosition().x + groundEnemyP->getSize().x / 2 <= 0)
         {
             availableGroundEnemies.push_back(groundEnemyP);
             it = BusyGroundEnemies.erase(it);
@@ -60,7 +60,7 @@ void Enemies::move(const sf::Vector2f &offset)
     for (auto it = BusyFlyingEnemies.begin(); it < BusyFlyingEnemies.end(); ++it)
     {
         auto flyingEnemyP = *it;
-        if (flyingEnemyP->getPosition().x + offset.x + flyingEnemyP->getSize().x / 2 <= 0)
+        if (flyingEnemyP->getPosition().x + flyingEnemyP->getSize().x / 2 <= 0)
         {
             availableFlyingEnemies.push_back(flyingEnemyP);
             it = BusyFlyingEnemies.erase(it);

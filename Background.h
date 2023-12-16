@@ -19,37 +19,41 @@ public:
 public:
     void init();
 
-    void draw(sf::RenderWindow &);
-    void update(const sf::Vector2f &);
+    void draw(sf::RenderWindow &) const;
     void move(const sf::Vector2f &);
 
     void setGroundHeight(float);
-    float getGroundHeight();
-    void setRoadSize(sf::Vector2f);
+    float getGroundHeight() const;
+
+    void setRoadSize(const sf::Vector2f &);
     const sf::Vector2f &getRoadSize() const;
 
     void setCloudsAmount(int);
-    int getCloudsAmount();
-    void setCloudSize(sf::Vector2f);
+    int getCloudsAmount() const;
+    void setCloudSize(const sf::Vector2f &);
     const sf::Vector2f &getCloudSize() const;
 
     void setTreesAmount(int);
-    int getTreesAmount();
-    void setTreeSize(sf::Vector2f);
+    int getTreesAmount() const;
+    void setTreeSize(const sf::Vector2f &);
     const sf::Vector2f &getTreeSize() const;
 
 private:
     sf::Vector2u windowSize;
 
-    float groundHeight{windowSize.y * 0.7f}; // How far is the "ground", on which the player running
-    sf::Vector2f roadSize{static_cast<float>(windowSize.x), windowSize.y * 0.05f};
+    float groundHeight; // How far is the "ground", on which the player running
+    sf::Vector2f roadSize;
     Model road{roadSize};
 
-    int cloudsAmount{6};
-    sf::Vector2f cloudSize{windowSize.x * 0.08f, windowSize.y * 0.05f};
+    int cloudsAmount;
+    sf::Vector2f cloudSize;
+    sf::Vector2f distBetweenClouds;
+    sf::Vector2f nextCloudPosition;
     std::vector<Model> clouds;
 
-    int treesAmount{12};
-    sf::Vector2f treeSize{windowSize.x * 0.04f, windowSize.y * 0.1f};
+    int treesAmount;
+    sf::Vector2f treeSize;
+    sf::Vector2f distBetweenTrees;
+    sf::Vector2f nextTreePosition;
     std::vector<Model> trees;
 };
