@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Player.hpp"
 
 Player::Player(const sf::Vector2u &size) : Model(sf::Vector2f(size.x * 0.03f, size.y * 0.1f)) {}
 Player::~Player() {}

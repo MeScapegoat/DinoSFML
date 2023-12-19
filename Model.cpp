@@ -1,45 +1,20 @@
-#include "Model.h"
+#include "Model.hpp"
 
-Model::Model(const sf::Vector2f &size) : rect(size)
+Model::Model(const sf::Vector2f &size) : RectangleShape(size)
 {
-    rect.setOrigin(sf::Vector2f(size.x / 2, size.y / 2));
-    rect.setPosition(0, 0);
+    setOrigin(sf::Vector2f(size.x / 2, size.y / 2));
 }
 
 Model::~Model() {}
 
 void Model::draw(sf::RenderWindow &window) const
 {
-    window.draw(rect);
+    window.draw(*this);
 }
 
-void Model::move(const sf::Vector2f &offset)
+sf::Vector2f Model::getScaledSize() const
 {
-    rect.move(offset);
-}
-
-void Model::setPosition(const sf::Vector2f &pos)
-{
-    rect.setPosition(pos);
-}
-
-const sf::Vector2f &Model::getPosition() const
-{
-    return rect.getPosition();
-}
-
-void Model::setColor(const sf::Color &color)
-{
-    rect.setFillColor(color);
-}
-
-const sf::Vector2f &Model::getSize() const
-{
-    return rect.getSize();
-}
-
-void Model::setSize(const sf::Vector2f &size)
-{
-    rect.setSize(size);
-    rect.setOrigin(size.x / 2, size.y / 2);
+    auto size = getSize();
+    auto scale = getScale();
+    return sf::Vector2f(size.x * scale.x, size.y * scale.y);
 }

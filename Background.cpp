@@ -1,4 +1,4 @@
-#include "Background.h"
+#include "Background.hpp"
 
 #include <iostream>
 
@@ -11,7 +11,8 @@ Background::~Background() {}
 void Background::init()
 {
     road.setSize(roadSize);
-    road.setPosition(sf::Vector2f(windowSize.x / 2, groundHeight));
+    road.setOrigin(roadSize.x / 2, roadSize.y / 2);
+    road.setPosition(windowSize.x / 2, groundHeight);
 
     clouds.clear();
     distBetweenClouds.x = static_cast<float>(windowSize.x) / cloudsAmount;
@@ -22,7 +23,7 @@ void Background::init()
     for (auto n = 0; n < cloudsAmount; ++n)
     {
         Model cloud(cloudSize);
-        cloud.setColor(sf::Color::Blue);
+        cloud.setFillColor(sf::Color::Blue);
         cloud.setPosition(nextCloudPosition);
         nextCloudPosition += distBetweenClouds;
         distBetweenClouds.y *= -1;
@@ -37,7 +38,7 @@ void Background::init()
     for (auto n = 0; n < treesAmount; ++n)
     {
         Model tree(treeSize);
-        tree.setColor(sf::Color(150, 75, 0));
+        tree.setFillColor(sf::Color(150, 75, 0));
         tree.setPosition(nextTreePosition);
         nextTreePosition += distBetweenTrees;
         trees.push_back(std::move(tree));
@@ -90,7 +91,7 @@ void Background::setGroundHeight(float newground)
 
 float Background::getGroundHeight() const
 {
-    return groundHeight;
+    return groundHeight - roadSize.y / 2;
 }
 
 void Background::setRoadSize(const sf::Vector2f &size)

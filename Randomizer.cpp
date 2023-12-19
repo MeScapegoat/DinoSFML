@@ -1,4 +1,4 @@
-#include "Randomizer.h"
+#include "Randomizer.hpp"
 
 Randomizer::Randomizer() : device(), engine(device()) {}
 
