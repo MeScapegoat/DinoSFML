@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Player.hpp"
 
 Player::Player(const sf::Vector2u &size) : Model(sf::Vector2f(size.x * 0.03f, size.y * 0.1f)) {}

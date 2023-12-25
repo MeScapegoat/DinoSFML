@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Background.hpp"
 
 #include <iostream>
@@ -15,12 +18,11 @@ void Background::init()
     road.setPosition(windowSize.x / 2, groundHeight);
 
     clouds.clear();
+    clouds.reserve(cloudsAmount + 1);
     distBetweenClouds.x = static_cast<float>(windowSize.x) / cloudsAmount;
-    cloudsAmount += 1;
-    clouds.reserve(cloudsAmount);
     distBetweenClouds.y = windowSize.y * 0.1f;
     nextCloudPosition = sf::Vector2f(cloudSize.x / 2, windowSize.y * 0.2f);
-    for (auto n = 0; n < cloudsAmount; ++n)
+    for (auto n = 0; n < cloudsAmount + 1; ++n)
     {
         Model cloud(cloudSize);
         cloud.setFillColor(sf::Color::Blue);
@@ -31,11 +33,10 @@ void Background::init()
     }
 
     trees.clear();
+    trees.reserve(treesAmount + 1);
     distBetweenTrees.x = static_cast<float>(windowSize.x) / treesAmount;
-    treesAmount += 1;
-    trees.reserve(treesAmount);
     nextTreePosition = sf::Vector2f(treeSize.x / 2, groundHeight - treeSize.y / 2);
-    for (auto n = 0; n < treesAmount; ++n)
+    for (auto n = 0; n < treesAmount + 1; ++n)
     {
         Model tree(treeSize);
         tree.setFillColor(sf::Color(150, 75, 0));

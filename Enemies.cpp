@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Enemies.hpp"
 
 #include <iostream>
@@ -9,6 +12,20 @@ Enemies::Enemies(sf::Vector2u windowSize, sf::Vector2f playerSize)
     groundEnemyColor = sf::Color::Red;
     distBetweenGroundEnemies = playerSize.x + groundEnemySize.x;
     groundEnemiesAmount = windowSize.x / distBetweenGroundEnemies + 2;
+
+    flyingEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.1f);
+    flyingEnemyColor = sf::Color::Cyan;
+    distBetweenFlyingEnemies = playerSize.x + flyingEnemySize.x;
+    flyingEnemiesAmount = windowSize.x / distBetweenFlyingEnemies + 2;
+
+    init();
+}
+
+void Enemies::init()
+{
+    uncheckedGroundEnemies.clear();
+    BusyGroundEnemies.clear();
+    groundEnemies.clear();
     groundEnemies.reserve(groundEnemiesAmount);
     for (auto n = 0; n < groundEnemiesAmount; ++n)
     {
@@ -18,10 +35,9 @@ Enemies::Enemies(sf::Vector2u windowSize, sf::Vector2f playerSize)
         availableGroundEnemies.push_back(&groundEnemies[n]);
     }
 
-    flyingEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.1f);
-    flyingEnemyColor = sf::Color::Cyan;
-    distBetweenFlyingEnemies = playerSize.x + flyingEnemySize.x;
-    flyingEnemiesAmount = windowSize.x / distBetweenFlyingEnemies + 2;
+    uncheckedFlyingEnemies.clear();
+    BusyFlyingEnemies.clear();
+    flyingEnemies.clear();
     flyingEnemies.reserve(flyingEnemiesAmount);
     for (auto n = 0; n < flyingEnemiesAmount; ++n)
     {

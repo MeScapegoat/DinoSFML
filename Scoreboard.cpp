@@ -1,12 +1,11 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Scoreboard.hpp"
 
-#include <iostream>
-
-Scoreboard::Scoreboard(std::string file)
+Scoreboard::Scoreboard()
 {
-    font.loadFromFile(file);
-    setFont(font);
-    setScore(0);
+    setFillColor(sf::Color::Red);
 }
 
 Scoreboard::~Scoreboard() {}

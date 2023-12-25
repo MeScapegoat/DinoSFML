@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include <SFML/Window/Event.hpp>
 
 #include <iostream>
@@ -6,16 +9,16 @@
 
 Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     : window(mode, title, style),
+      gameOverText(window.getSize()),
+      pausedText(window.getSize()),
       background(window.getSize()),
       player(window.getSize()),
       enemies(window.getSize(), player.getSize()),
-      scoreboard("../LOST_LATE.ttf"),
-      worldVelocity(200),
       worldVelocityStep(worldVelocity * (9.f / 100)), // 9.f/y, where y is at which spawn count we reach max speed if max speed is 10x base speed
       maxWorldVelocity(worldVelocity * 10),
       playerVelocityStep(window.getSize().y * 0.001f * -1 * (9.f / 100))
 {
-    auto size = window.getSize();
+    const auto &size = window.getSize();
 
     background.setRoadSize(sf::Vector2f(size.x, size.y * 0.05f));
     background.setGroundHeight(size.y * 0.9f);
@@ -25,24 +28,51 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
 
     background.setTreesAmount(11);
     background.setTreeSize(sf::Vector2f(size.x * 0.06f, size.y * 0.3f));
+
+    player.setFillColor(sf::Color(0, 255, 0));
+    player.setJumpHeight(size.y * 0.5f);
+    enemies.setGroundHeight(background.getGroundHeight());
+
+    font.loadFromFile("../LOST_LATE.ttf");
+
+    scoreboard.setFont(font);
+    scoreboard.setPosition(0, size.y);
+    scoreboard.setCharacterSize(size.y - background.getGroundHeight() - background.getRoadSize().y / 2);
+    scoreboard.setOrigin(0, scoreboard.getCharacterSize());
+
+    pausedText.setFont(font);
+    pausedText.setTitleText("Game is Paused!");
+    pausedText.setInfoText("ESC - pause/continue\narrow up/W - jump\narrow down/S - slide");
+    pausedText.setTextColor(sf::Color::Red);
+
+    gameOverText.setFont(font);
+    gameOverText.setTitleText("Game over!");
+    gameOverText.setInfoText("Press ESC to continue");
+    gameOverText.setTextColor(sf::Color::Red);
+
+    isPaused = true;
+    pausedText.toShow = true;
+
+    restart();
+}
+
+void Game::restart()
+{
+    const auto &size = window.getSize();
     background.init();
+    enemies.init();
+    worldVelocity = 200;
+    elapsedTime = 0;
 
     player.setPosition(size.x * 0.15f + player.getSize().x / 2,
                        background.getGroundHeight() - player.getSize().y / 2);
-    player.setFillColor(sf::Color(0, 255, 0));
-    player.setJumpHeight(size.y * 0.5f);
     player.setJumpVelocity(size.y * 0.001f * -1);
 
     minSpawnInterval = std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity;
     spawnInterval = random.getFloat(minSpawnInterval, 2 * minSpawnInterval);
 
-    enemies.setGroundHeight(background.getGroundHeight());
     enemies.spawn(random.getInt(0, 1));
-
-    scoreboard.setPosition(0, window.getSize().y);
-    scoreboard.setFillColor(sf::Color::Red);
-    scoreboard.setCharacterSize(window.getSize().y - background.getGroundHeight() - background.getRoadSize().y / 2);
-    scoreboard.setOrigin(0, scoreboard.getCharacterSize());
+    scoreboard.setScore(0);
 }
 
 void Game::processEvent()
@@ -67,8 +97,20 @@ void Game::processEvent()
             window.close();
             break;
         case sf::Event::KeyPressed:
+
             switch (event.key.code)
             {
+            case sf::Keyboard::Escape:
+                if (isGameOver)
+                {
+                    restart();
+                    isGameOver = !isGameOver;
+                    gameOverText.toShow = !gameOverText.toShow;
+                    break;
+                }
+                isPaused = !isPaused;
+                pausedText.toShow = !pausedText.toShow;
+                break;
 
             default:
                 break;
@@ -84,26 +126,40 @@ void Game::render()
     if (!window.isOpen())
         return;
 
-    window.clear(sf::Color::Black);
+    window.clear(sf::Color::Green);
 
     background.draw(window);
     player.draw(window);
     enemies.draw(window);
     scoreboard.draw(window);
 
+    if (pausedText.toShow)
+        pausedText.draw(window);
+    if (gameOverText.toShow)
+        gameOverText.draw(window);
+
     window.display();
 }
 
 void Game::update()
 {
+    elapsedTime = clock.restart().asSeconds();
+
     if (!window.isOpen())
         return;
+
     if (enemies.checkCrash(player))
+    {
+        isGameOver = true;
+        gameOverText.toShow = true;
+    }
+
+    if (isPaused or isGameOver)
         return;
+
     if (enemies.checkOvercome(player))
         scoreboard.setScore(scoreboard.getScore() + 1);
 
-    elapsedTime = clock.restart().asSeconds();
     timePassed += elapsedTime;
     auto speed = worldVelocity * elapsedTime * -1.f;
     if (timePassed > spawnInterval)
