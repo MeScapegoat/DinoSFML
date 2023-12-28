@@ -12,13 +12,16 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
       gameOverText(window.getSize()),
       pausedText(window.getSize()),
       background(window.getSize()),
-      player(window.getSize()),
-      enemies(window.getSize(), player.getSize()),
+      player("../assets/proto2.png"),
+      enemies(window.getSize()),
       worldVelocityStep(worldVelocity * (9.f / 100)), // 9.f/y, where y is at which spawn count we reach max speed if max speed is 10x base speed
       maxWorldVelocity(worldVelocity * 10),
       playerVelocityStep(window.getSize().y * 0.001f * -1 * (9.f / 100))
 {
     const auto &size = window.getSize();
+
+    player.setJumpHeight(size.y * 0.5f);
+    player.setSize(size.x * 0.06f, size.y * 0.2f);
 
     background.setRoadSize(sf::Vector2f(size.x, size.y * 0.05f));
     background.setGroundHeight(size.y * 0.9f);
@@ -29,8 +32,13 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     background.setTreesAmount(11);
     background.setTreeSize(sf::Vector2f(size.x * 0.06f, size.y * 0.3f));
 
-    player.setFillColor(sf::Color(0, 255, 0));
-    player.setJumpHeight(size.y * 0.5f);
+    background.loadCloudTexture("../assets/cloud.png");
+    background.loadTreeTexture("../assets/tree.png");
+
+    enemies.setPlayerSize(player.getSize());
+    enemies.loadFlyingEnemiesTextures(std::vector<sf::String>{"../assets/batup.png", "../assets/batdown.png"});
+    enemies.loadGroundEnemiesTextures(std::vector<sf::String>{"../assets/wormup.png", "../assets/wormdown.png"});
+
     enemies.setGroundHeight(background.getGroundHeight());
 
     font.loadFromFile("../LOST_LATE.ttf");
@@ -66,6 +74,8 @@ void Game::restart()
 
     player.setPosition(size.x * 0.15f + player.getSize().x / 2,
                        background.getGroundHeight() - player.getSize().y / 2);
+    auto pos = player.getPosition();
+    auto sc = player.getScale();
     player.setJumpVelocity(size.y * 0.001f * -1);
 
     minSpawnInterval = std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity;
@@ -126,12 +136,12 @@ void Game::render()
     if (!window.isOpen())
         return;
 
-    window.clear(sf::Color::Green);
+    window.clear(sf::Color::Black);
 
     background.draw(window);
-    player.draw(window);
-    enemies.draw(window);
     scoreboard.draw(window);
+    enemies.draw(window);
+    player.draw(window);
 
     if (pausedText.toShow)
         pausedText.draw(window);
@@ -160,12 +170,11 @@ void Game::update()
     if (enemies.checkOvercome(player))
         scoreboard.setScore(scoreboard.getScore() + 1);
 
-    timePassed += elapsedTime;
-    auto speed = worldVelocity * elapsedTime * -1.f;
-    if (timePassed > spawnInterval)
+    spawnTimer += elapsedTime;
+    if (spawnTimer > spawnInterval)
     {
         enemies.spawn(random.getInt(0, 1));
-        timePassed -= spawnInterval;
+        spawnTimer -= spawnInterval;
         minSpawnInterval = std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity;
         spawnInterval = random.getFloat(minSpawnInterval, 2 * minSpawnInterval);
 
@@ -174,6 +183,13 @@ void Game::update()
             worldVelocity += worldVelocityStep;
             player.setJumpVelocity(player.getJumpVelocity() + playerVelocityStep);
         }
+    }
+
+    AnimationTimer += elapsedTime;
+    if (AnimationTimer > 0.5f)
+    {
+        AnimationTimer -= 0.5f;
+        enemies.updateAnimations();
     }
 
     if (playerVelocity < 0)
@@ -192,7 +208,7 @@ void Game::update()
         if (!playerVelocity)
         {
             player.setScale(2.f, 0.5f);
-            player.setPosition(player.getPosition().x, background.getGroundHeight() - player.getScaledSize().y / 2);
+            player.setPosition(player.getPosition().x, background.getGroundHeight() - player.getSize().y / 2);
         }
     }
     else
@@ -200,11 +216,12 @@ void Game::update()
         if (!playerVelocity)
         {
             player.setScale(1.f, 1.f);
-            player.setPosition(player.getPosition().x, background.getGroundHeight() - player.getScaledSize().y / 2);
+            player.setPosition(player.getPosition().x, background.getGroundHeight() - player.getSize().y / 2);
         }
     }
     isCrawling = false;
 
+    auto speed = worldVelocity * elapsedTime * -1.f;
     background.move(sf::Vector2f(speed, 0));
     enemies.move(sf::Vector2f(speed, 0));
     player.move(sf::Vector2f(0, playerVelocity));

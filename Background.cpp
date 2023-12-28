@@ -5,9 +5,7 @@
 
 #include <iostream>
 
-Background::Background(const sf::Vector2u &windowSize)
-    : windowSize(windowSize),
-      road(sf::Vector2f(0, 0)) {}
+Background::Background(const sf::Vector2u &windowSize) : windowSize(windowSize) {}
 
 Background::~Background() {}
 
@@ -24,8 +22,9 @@ void Background::init()
     nextCloudPosition = sf::Vector2f(cloudSize.x / 2, windowSize.y * 0.2f);
     for (auto n = 0; n < cloudsAmount + 1; ++n)
     {
-        Model cloud(cloudSize);
-        cloud.setFillColor(sf::Color::Blue);
+        Model cloud;
+        cloud.setTexture(cloudTexture);
+        cloud.setSize(cloudSize);
         cloud.setPosition(nextCloudPosition);
         nextCloudPosition += distBetweenClouds;
         distBetweenClouds.y *= -1;
@@ -38,8 +37,9 @@ void Background::init()
     nextTreePosition = sf::Vector2f(treeSize.x / 2, groundHeight - treeSize.y / 2);
     for (auto n = 0; n < treesAmount + 1; ++n)
     {
-        Model tree(treeSize);
-        tree.setFillColor(sf::Color(150, 75, 0));
+        Model tree;
+        tree.setTexture(treeTexture);
+        tree.setSize(treeSize);
         tree.setPosition(nextTreePosition);
         nextTreePosition += distBetweenTrees;
         trees.push_back(std::move(tree));
@@ -54,7 +54,7 @@ void Background::draw(sf::RenderWindow &window) const
     for (const auto &tree : trees)
         tree.draw(window);
 
-    road.draw(window);
+    window.draw(road);
 }
 
 void Background::move(const sf::Vector2f &offset)
@@ -143,4 +143,14 @@ void Background::setTreeSize(const sf::Vector2f &size)
 const sf::Vector2f &Background::getTreeSize() const
 {
     return treeSize;
+}
+
+void Background::loadCloudTexture(const sf::String &file)
+{
+    cloudTexture.loadFromFile(file);
+}
+
+void Background::loadTreeTexture(const sf::String &file)
+{
+    treeTexture.loadFromFile(file);
 }

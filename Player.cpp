@@ -3,7 +3,11 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Player.hpp"
 
-Player::Player(const sf::Vector2u &size) : Model(sf::Vector2f(size.x * 0.03f, size.y * 0.1f)) {}
+Player::Player(const sf::String &file)
+{
+    texture.loadFromFile(file);
+    setTexture(texture);
+}
 Player::~Player() {}
 
 void Player::setJumpVelocity(float v)
