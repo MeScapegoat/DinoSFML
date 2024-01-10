@@ -12,11 +12,8 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
       gameOverText(window.getSize()),
       pausedText(window.getSize()),
       background(window.getSize()),
-      player("../assets/proto2.png"),
-      enemies(window.getSize()),
-      worldVelocityStep(worldVelocity * (9.f / 100)), // 9.f/y, where y is at which spawn count we reach max speed if max speed is 10x base speed
-      maxWorldVelocity(worldVelocity * 10),
-      playerVelocityStep(window.getSize().y * 0.001f * -1 * (9.f / 100))
+      player("../assets/proto.png"),
+      enemies(window.getSize())
 {
     const auto &size = window.getSize();
 
@@ -70,65 +67,16 @@ void Game::restart()
     background.init();
     enemies.init();
     worldVelocity = 200;
+    maxWorldVelocity = worldVelocity * 5;
+    worldVelocityStep = (maxWorldVelocity - worldVelocity) / 100;
     elapsedTime = 0;
 
     player.setPosition(size.x * 0.15f + player.getSize().x / 2,
                        background.getGroundHeight() - player.getSize().y / 2);
-    auto pos = player.getPosition();
-    auto sc = player.getScale();
     player.setJumpVelocity(size.y * 0.001f * -1);
-
-    minSpawnInterval = std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity;
-    spawnInterval = random.getFloat(minSpawnInterval, 2 * minSpawnInterval);
-
-    enemies.spawn(random.getInt(0, 1));
+    player.setJumpVelocityStep(player.getJumpVelocity() / 100);
+    enemies.setMinSpawnInterval(std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity);
     scoreboard.setScore(0);
-}
-
-void Game::processEvent()
-{
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) or sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-    {
-        isCrawling = true;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) or sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-    {
-        if (playerVelocity > 0)
-            playerVelocity = -1 * player.getJumpVelocity();
-        else
-            playerVelocity = player.getJumpVelocity();
-    }
-
-    while (window.pollEvent(event))
-    {
-        switch (event.type)
-        {
-        case sf::Event::Closed:
-            window.close();
-            break;
-        case sf::Event::KeyPressed:
-
-            switch (event.key.code)
-            {
-            case sf::Keyboard::Escape:
-                if (isGameOver)
-                {
-                    restart();
-                    isGameOver = !isGameOver;
-                    gameOverText.toShow = !gameOverText.toShow;
-                    break;
-                }
-                isPaused = !isPaused;
-                pausedText.toShow = !pausedText.toShow;
-                break;
-
-            default:
-                break;
-            }
-        default:
-            break;
-        }
-    }
 }
 
 void Game::render()
@@ -153,59 +101,48 @@ void Game::render()
 
 void Game::update()
 {
-    elapsedTime = clock.restart().asSeconds();
-
     if (!window.isOpen())
         return;
-
-    if (enemies.checkCrash(player))
+    elapsedTime = clock.restart().asSeconds();
+    //
+    while (window.pollEvent(event))
     {
-        isGameOver = true;
-        gameOverText.toShow = true;
+        switch (event.type)
+        {
+        case sf::Event::Closed:
+            window.close();
+            break;
+
+        case sf::Event::KeyPressed:
+            switch (event.key.code)
+            {
+            case sf::Keyboard::Escape:
+                if (isGameOver)
+                {
+                    restart();
+                    isGameOver = !isGameOver;
+                    gameOverText.toShow = !gameOverText.toShow;
+                    break;
+                }
+                isPaused = !isPaused;
+                pausedText.toShow = !pausedText.toShow;
+                break;
+
+            default:
+                break;
+            } // switch event.key.code
+
+        default:
+            break;
+        } // switch event.type
     }
 
     if (isPaused or isGameOver)
         return;
 
-    if (enemies.checkOvercome(player))
-        scoreboard.setScore(scoreboard.getScore() + 1);
-
-    spawnTimer += elapsedTime;
-    if (spawnTimer > spawnInterval)
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) or sf::Keyboard::isKeyPressed(sf::Keyboard::S))
     {
-        enemies.spawn(random.getInt(0, 1));
-        spawnTimer -= spawnInterval;
-        minSpawnInterval = std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity;
-        spawnInterval = random.getFloat(minSpawnInterval, 2 * minSpawnInterval);
-
-        if (worldVelocity < maxWorldVelocity)
-        {
-            worldVelocity += worldVelocityStep;
-            player.setJumpVelocity(player.getJumpVelocity() + playerVelocityStep);
-        }
-    }
-
-    AnimationTimer += elapsedTime;
-    if (AnimationTimer > 0.5f)
-    {
-        AnimationTimer -= 0.5f;
-        enemies.updateAnimations();
-    }
-
-    if (playerVelocity < 0)
-    {
-        if (player.getPosition().y + player.getSize().y / 2 < player.getJumpHeight())
-            playerVelocity *= -1;
-    }
-    else if (playerVelocity > 0)
-    {
-        if (player.getPosition().y + player.getSize().y / 2 > background.getGroundHeight())
-            playerVelocity = 0;
-    }
-
-    if (isCrawling)
-    {
-        if (!playerVelocity)
+        if (!player.getCurrentJumpVelocity())
         {
             player.setScale(2.f, 0.5f);
             player.setPosition(player.getPosition().x, background.getGroundHeight() - player.getSize().y / 2);
@@ -213,25 +150,63 @@ void Game::update()
     }
     else
     {
-        if (!playerVelocity)
+        if (!player.getCurrentJumpVelocity())
         {
             player.setScale(1.f, 1.f);
             player.setPosition(player.getPosition().x, background.getGroundHeight() - player.getSize().y / 2);
         }
     }
-    isCrawling = false;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) or sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    {
+        if (player.getCurrentJumpVelocity() > 0)
+            player.setCurrentJumpVelocity(-1 * player.getJumpVelocity());
+        else
+            player.setCurrentJumpVelocity(player.getJumpVelocity());
+    }
+    //
+
+    if (enemies.checkCrash(player))
+    {
+        // isGameOver = true;
+        // gameOverText.toShow = true;
+        // return;
+    }
+
+    if (enemies.checkOvercome(player))
+        scoreboard.setScore(scoreboard.getScore() + 1);
+
+    if (enemies.spawn(elapsedTime))
+    {
+        enemies.setMinSpawnInterval(std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity);
+        if (worldVelocity < maxWorldVelocity)
+        {
+            worldVelocity += worldVelocityStep;
+            player.setJumpVelocity(player.getJumpVelocity() + player.getJumpVelocityStep());
+        }
+    }
+    enemies.updateAnimations(elapsedTime, worldVelocity);
+
+    if (player.getCurrentJumpVelocity() < 0)
+    {
+        if (player.getPosition().y + player.getSize().y / 2 < player.getJumpHeight())
+            player.setCurrentJumpVelocity(player.getCurrentJumpVelocity() * -1);
+    }
+    else if (player.getCurrentJumpVelocity() > 0)
+    {
+        if (player.getPosition().y + player.getSize().y / 2 > background.getGroundHeight())
+            player.setCurrentJumpVelocity(0);
+    }
 
     auto speed = worldVelocity * elapsedTime * -1.f;
     background.move(sf::Vector2f(speed, 0));
     enemies.move(sf::Vector2f(speed, 0));
-    player.move(sf::Vector2f(0, playerVelocity));
+    player.move(sf::Vector2f(0, player.getCurrentJumpVelocity()));
 }
 
 void Game::run()
 {
     while (window.isOpen())
     {
-        processEvent();
         update();
         render();
     }

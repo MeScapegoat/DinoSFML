@@ -13,7 +13,7 @@ void Enemies::init()
     distBetweenGroundEnemies = playerSize.x + groundEnemySize.x;
     groundEnemiesAmount = windowSize.x / distBetweenGroundEnemies + 2;
 
-    flyingEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.1f);
+    flyingEnemySize = sf::Vector2f(windowSize.x * 0.1f, windowSize.y * 0.1f);
     distBetweenFlyingEnemies = playerSize.x + flyingEnemySize.x;
     flyingEnemiesAmount = windowSize.x / distBetweenFlyingEnemies + 2;
 
@@ -50,6 +50,11 @@ void Enemies::init()
         flyingEnemies.push_back(flyingEnemy);
         availableFlyingEnemies.push_back(&flyingEnemies[n]);
     }
+    flyingAnimationDistance = flyingEnemies.front().getSize().x * 1;
+    groundAnimationDistance = groundEnemies.front().getSize().x * 1;
+
+    flyingAnimationInterval = flyingAnimationDistance / 200;
+    groundAnimationInterval = groundAnimationDistance / 200;
 }
 
 Enemies::~Enemies() {}
@@ -90,9 +95,14 @@ void Enemies::move(const sf::Vector2f &offset)
     }
 }
 
-void Enemies::spawn(int type)
+bool Enemies::spawn(float elapsedTime)
 {
-    if (type > 0)
+    spawnTimer += elapsedTime;
+    if (spawnTimer < spawnInterval)
+        return false;
+
+    spawnTimer -= spawnInterval;
+    if (random.getInt(0, 1))
     {
         auto &groundEnemy = *availableGroundEnemies.front();
         busyGroundEnemies.push_back(availableGroundEnemies.front());
@@ -108,6 +118,7 @@ void Enemies::spawn(int type)
         flyingEnemy.setPosition(windowSize.x + flyingEnemy.getSize().x / 2, groundHeight - 5 * flyingEnemy.getSize().y * 0.8);
         availableFlyingEnemies.pop_front();
     }
+    return true;
 }
 
 float Enemies::getGroundDistance() const
@@ -208,11 +219,54 @@ void Enemies::loadGroundEnemiesTextures(const std::vector<sf::String> &files)
     }
 }
 
-void Enemies::updateAnimations()
+void Enemies::updateAnimations(float elapsedTime, float velocity)
 {
-    for (auto &Enemy : busyGroundEnemies)
-        Enemy->updateAnimation();
+    flyingAnimationTimer += elapsedTime;
+    groundAnimationTimer += elapsedTime;
+    if (flyingAnimationTimer > flyingAnimationInterval)
+    {
+        flyingAnimationTimer -= flyingAnimationInterval;
+        flyingAnimationInterval = flyingAnimationDistance / velocity;
+        for (auto &Enemy : busyGroundEnemies)
+            Enemy->updateAnimation();
+    }
 
-    for (auto &Enemy : busyFlyingEnemies)
-        Enemy->updateAnimation();
+    if (groundAnimationTimer > groundAnimationInterval)
+    {
+        groundAnimationTimer -= groundAnimationInterval;
+        groundAnimationInterval = groundAnimationDistance / velocity;
+        for (auto &Enemy : busyFlyingEnemies)
+            Enemy->updateAnimation();
+    }
+}
+
+void Enemies::setSpawnTimer(float value)
+{
+    spawnTimer = value;
+}
+
+float Enemies::getSpawnTimer() const
+{
+    return spawnTimer;
+}
+
+void Enemies::setMinSpawnInterval(float value)
+{
+    minSpawnInterval = value;
+    spawnInterval = random.getFloat(minSpawnInterval, 2 * minSpawnInterval);
+}
+
+float Enemies::getMinSpawnInterval() const
+{
+    return minSpawnInterval;
+}
+
+void Enemies::setSpawnInterval(float value)
+{
+    spawnInterval = value;
+}
+
+float Enemies::getSpawnInterval() const
+{
+    return spawnInterval;
 }

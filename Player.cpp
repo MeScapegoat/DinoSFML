@@ -10,6 +10,16 @@ Player::Player(const sf::String &file)
 }
 Player::~Player() {}
 
+void Player::setCurrentJumpVelocity(float v)
+{
+    currentJumpVelocity = v;
+}
+
+float Player::getCurrentJumpVelocity() const
+{
+    return currentJumpVelocity;
+}
+
 void Player::setJumpVelocity(float v)
 {
     jumpVelocity = v;
@@ -18,6 +28,16 @@ void Player::setJumpVelocity(float v)
 float Player::getJumpVelocity() const
 {
     return jumpVelocity;
+}
+
+void Player::setJumpVelocityStep(float v)
+{
+    jumpVelocityStep = v;
+}
+
+float Player::getJumpVelocityStep() const
+{
+    return jumpVelocityStep;
 }
 
 void Player::setJumpHeight(float h)

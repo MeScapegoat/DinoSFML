@@ -28,13 +28,14 @@ void Model::setSize(sf::Vector2f size)
     setSize(size.x, size.y);
 }
 
+#include <iostream>
 void Model::setTexture(const sf::Texture &texture)
 {
     sprite.setTexture(texture);
-    auto textureSize = getTexture()->getSize();
-    sprite.setOrigin(textureSize.x / 2, textureSize.y / 2);
+    auto textureSize = texture.getSize();
     normalScale = {size.x / textureSize.x, size.y / textureSize.y};
     sprite.setScale(normalScale);
+    sprite.setOrigin(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
 }
 
 const sf::Texture *Model::getTexture() const

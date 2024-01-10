@@ -20,5 +20,6 @@ void AnimatedModel::updateAnimation()
 {
     if (currentAnimationID >= animations->size())
         currentAnimationID = 0;
-    setTexture(animations->at(currentAnimationID++));
+    auto &texture = animations->at(currentAnimationID++);
+    setTexture(texture);
 }
