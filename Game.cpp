@@ -1,62 +1,67 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
-#include <SFML/Window/Event.hpp>
-
 #include <iostream>
 
 #include "Game.hpp"
 
 Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     : window(mode, title, style),
-      gameOverText(window.getSize()),
-      pausedText(window.getSize()),
-      background(window.getSize()),
+      gameOverText(&window),
+      pausedText(&window),
+      scoreboard(&window),
+      background(&window),
       player("../assets/proto.png"),
       enemies(window.getSize())
 {
     const auto &size = window.getSize();
 
-    player.setJumpHeight(size.y * 0.5f);
+    // Расположение
+    scoreboard.setPosition(0, size.y);
+    pausedText.setPosition(window.getSize().x / 2, window.getSize().y * 0.4f);
+    gameOverText.setPosition(window.getSize().x / 2, window.getSize().y * 0.4f);
+
+    // Внешний вид
     player.setSize(size.x * 0.06f, size.y * 0.2f);
 
-    background.setRoadSize(sf::Vector2f(size.x, size.y * 0.05f));
-    background.setGroundHeight(size.y * 0.9f);
-
-    background.setCloudsAmount(3);
-    background.setCloudSize(sf::Vector2f(size.x * 0.12f, size.y * 0.08f));
-
-    background.setTreesAmount(11);
-    background.setTreeSize(sf::Vector2f(size.x * 0.06f, size.y * 0.3f));
-
-    background.loadCloudTexture("../assets/cloud.png");
-    background.loadTreeTexture("../assets/tree.png");
+    background.setCloudsAmount(3);                                         // кол-во облаков
+    background.setCloudSize(sf::Vector2f(size.x * 0.12f, size.y * 0.08f)); // размер облаков
+    background.setTreesAmount(11);                                         // кол-во деревьев
+    background.setTreeSize(sf::Vector2f(size.x * 0.06f, size.y * 0.3f));   // размер деревьев
+    background.loadCloudTexture("../assets/cloud.png");                    // Текстура облака
+    background.loadTreeTexture("../assets/tree.png");                      // Текстура дерева
 
     enemies.setPlayerSize(player.getSize());
     enemies.loadFlyingEnemiesTextures(std::vector<sf::String>{"../assets/batup.png", "../assets/batdown.png"});
     enemies.loadGroundEnemiesTextures(std::vector<sf::String>{"../assets/wormup.png", "../assets/wormdown.png"});
-
-    enemies.setGroundHeight(background.getGroundHeight());
-
+    enemies.setGroundHeight(background.getGround());
     font.loadFromFile("../LOST_LATE.ttf");
 
     scoreboard.setFont(font);
-    scoreboard.setPosition(0, size.y);
-    scoreboard.setCharacterSize(size.y - background.getGroundHeight() - background.getRoadSize().y / 2);
+    scoreboard.setCharacterSize(size.y - background.road.getPosition().y);
     scoreboard.setOrigin(0, scoreboard.getCharacterSize());
+    scoreboard.setFillColor(sf::Color::Red);
 
-    pausedText.setFont(font);
+    pausedText.setGeneralFont(font);
     pausedText.setTitleText("Game is Paused!");
-    pausedText.setInfoText("ESC - pause/continue\narrow up/W - jump\narrow down/S - slide");
-    pausedText.setTextColor(sf::Color::Red);
+    pausedText.setContentText("ESC - pause/continue\n"
+                              "arrow up/W - jump\n"
+                              "arrow down/S - slide");
+    pausedText.title.setFillColor(sf::Color::Red);
+    pausedText.content.setFillColor(sf::Color::Red);
+    // pausedText.content.setOutlineColor(sf::Color::Cyan);
+    // pausedText.content.setOutlineThickness(1.f);
 
-    gameOverText.setFont(font);
+    gameOverText.setGeneralFont(font);
     gameOverText.setTitleText("Game over!");
-    gameOverText.setInfoText("Press ESC to continue");
-    gameOverText.setTextColor(sf::Color::Red);
+    gameOverText.setContentText("Press ESC to continue");
+    gameOverText.title.setFillColor(sf::Color::Red);
+    gameOverText.content.setFillColor(sf::Color::Red);
 
+    // Геймплейное
+    player.setJumpHeight(size.y * 0.5f);
     isPaused = true;
-    pausedText.toShow = true;
+    pausedText.isActive = true;
 
     restart();
 }
@@ -72,7 +77,7 @@ void Game::restart()
     elapsedTime = 0;
 
     player.setPosition(size.x * 0.15f + player.getSize().x / 2,
-                       background.getGroundHeight() - player.getSize().y / 2);
+                       background.getGround() - player.getSize().y / 2);
     player.setJumpVelocity(size.y * 0.001f * -1);
     player.setJumpVelocityStep(player.getJumpVelocity() / 100);
     enemies.setMinSpawnInterval(std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity);
@@ -86,16 +91,15 @@ void Game::render()
 
     window.clear(sf::Color::Black);
 
-    background.draw(window);
-    scoreboard.draw(window);
+    background.draw();
+    scoreboard.draw();
     enemies.draw(window);
     player.draw(window);
 
-    if (pausedText.toShow)
-        pausedText.draw(window);
-    if (gameOverText.toShow)
-        gameOverText.draw(window);
+    pausedText.draw();
+    gameOverText.draw();
 
+    // t.draw();
     window.display();
 }
 
@@ -121,11 +125,11 @@ void Game::update()
                 {
                     restart();
                     isGameOver = !isGameOver;
-                    gameOverText.toShow = !gameOverText.toShow;
+                    gameOverText.isActive = !gameOverText.isActive;
                     break;
                 }
                 isPaused = !isPaused;
-                pausedText.toShow = !pausedText.toShow;
+                pausedText.isActive = !pausedText.isActive;
                 break;
 
             default:
@@ -145,7 +149,7 @@ void Game::update()
         if (!player.getCurrentJumpVelocity())
         {
             player.setScale(2.f, 0.5f);
-            player.setPosition(player.getPosition().x, background.getGroundHeight() - player.getSize().y / 2);
+            player.setPosition(player.getPosition().x, background.getGround() - player.getSize().y / 2);
         }
     }
     else
@@ -153,7 +157,7 @@ void Game::update()
         if (!player.getCurrentJumpVelocity())
         {
             player.setScale(1.f, 1.f);
-            player.setPosition(player.getPosition().x, background.getGroundHeight() - player.getSize().y / 2);
+            player.setPosition(player.getPosition().x, background.getGround() - player.getSize().y / 2);
         }
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) or sf::Keyboard::isKeyPressed(sf::Keyboard::W))
@@ -173,7 +177,7 @@ void Game::update()
     }
 
     if (enemies.checkOvercome(player))
-        scoreboard.setScore(scoreboard.getScore() + 1);
+        scoreboard.increaseScore(1);
 
     if (enemies.spawn(elapsedTime))
     {
@@ -193,7 +197,7 @@ void Game::update()
     }
     else if (player.getCurrentJumpVelocity() > 0)
     {
-        if (player.getPosition().y + player.getSize().y / 2 > background.getGroundHeight())
+        if (player.getPosition().y + player.getSize().y / 2 > background.getGround())
             player.setCurrentJumpVelocity(0);
     }
 

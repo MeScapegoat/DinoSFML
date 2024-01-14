@@ -3,16 +3,19 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Scoreboard.hpp"
 
-Scoreboard::Scoreboard()
+Scoreboard::Scoreboard(sf::RenderWindow *windowH) : windowHandler(windowH)
 {
-    setFillColor(sf::Color::Red);
+    setScore(0);
 }
 
-Scoreboard::~Scoreboard() {}
-
-void Scoreboard::draw(sf::RenderWindow &window) const
+void Scoreboard::draw()
 {
-    window.draw(*this);
+    windowHandler->draw(*this);
+}
+
+void Scoreboard::increaseScore(unsigned inc)
+{
+    setScore(score + inc);
 }
 
 void Scoreboard::setScore(unsigned newscore)

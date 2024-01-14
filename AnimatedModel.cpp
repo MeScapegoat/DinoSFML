@@ -2,9 +2,7 @@
 
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "AnimatedModel.hpp"
-AnimatedModel::AnimatedModel() {}
-
-AnimatedModel::~AnimatedModel() {}
+AnimatedModel::AnimatedModel(sf::RenderWindow *windowH) : Model(windowH) {}
 
 const std::vector<sf::Texture> *AnimatedModel::getAnimations() const
 {

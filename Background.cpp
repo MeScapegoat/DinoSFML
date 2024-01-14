@@ -5,15 +5,14 @@
 
 #include <iostream>
 
-Background::Background(const sf::Vector2u &windowSize) : windowSize(windowSize) {}
-
-Background::~Background() {}
+Background::Background(sf::RenderWindow *windowH) : windowHandler(windowH) {}
 
 void Background::init()
 {
-    road.setSize(roadSize);
-    road.setOrigin(roadSize.x / 2, roadSize.y / 2);
-    road.setPosition(windowSize.x / 2, groundHeight);
+    auto windowSize = windowHandler->getSize();
+    road.setSize(sf::Vector2f(windowSize.x, windowSize.y * 0.05f));
+    road.setPosition(windowSize.x / 2, windowSize.y * 0.9f);
+    road.setOrigin(road.getSize().x / 2, road.getSize().y / 2);
 
     clouds.clear();
     clouds.reserve(cloudsAmount + 1);
@@ -22,7 +21,7 @@ void Background::init()
     nextCloudPosition = sf::Vector2f(cloudSize.x / 2, windowSize.y * 0.2f);
     for (auto n = 0; n < cloudsAmount + 1; ++n)
     {
-        Model cloud;
+        Model cloud(windowHandler);
         cloud.setTexture(cloudTexture);
         cloud.setSize(cloudSize);
         cloud.setPosition(nextCloudPosition);
@@ -34,10 +33,10 @@ void Background::init()
     trees.clear();
     trees.reserve(treesAmount + 1);
     distBetweenTrees.x = static_cast<float>(windowSize.x) / treesAmount;
-    nextTreePosition = sf::Vector2f(treeSize.x / 2, groundHeight - treeSize.y / 2);
+    nextTreePosition = sf::Vector2f(treeSize.x / 2, road.getPosition().y - road.getSize().y / 2 - treeSize.y / 2);
     for (auto n = 0; n < treesAmount + 1; ++n)
     {
-        Model tree;
+        Model tree(windowHandler);
         tree.setTexture(treeTexture);
         tree.setSize(treeSize);
         tree.setPosition(nextTreePosition);
@@ -46,25 +45,28 @@ void Background::init()
     }
 }
 
-void Background::draw(sf::RenderWindow &window) const
+void Background::draw()
 {
-    for (const auto &cloud : clouds)
-        cloud.draw(window);
+    if (!windowHandler)
+        return;
+    for (auto &cloud : clouds)
+        cloud.draw();
 
-    for (const auto &tree : trees)
-        tree.draw(window);
+    for (auto &tree : trees)
+        tree.draw();
 
-    window.draw(road);
+    windowHandler->draw(road);
 }
 
-void Background::move(const sf::Vector2f &offset)
+void Background::move(float x, float y)
 {
+    sf::Vector2f offset(x, y);
     nextCloudPosition += offset;
     nextTreePosition += offset;
     for (auto &cloud : clouds)
     {
-        if (cloud.getPosition().x + cloud.getSize().x / 2 > 0)
-            cloud.move(offset);
+        if (cloud.sprite.getPosition().x + cloud.getSize().x / 2 > 0)
+            cloud.sprite.move(offset);
         else
         {
             cloud.setPosition(nextCloudPosition);
@@ -75,8 +77,8 @@ void Background::move(const sf::Vector2f &offset)
 
     for (auto &tree : trees)
     {
-        if (tree.getPosition().x + tree.getSize().x / 2 > 0)
-            tree.move(offset);
+        if (tree.sprite.getPosition().x + tree.getSize().x / 2 > 0)
+            tree.sprite.move(offset);
         else
         {
             tree.setPosition(nextTreePosition);
@@ -85,24 +87,9 @@ void Background::move(const sf::Vector2f &offset)
     }
 }
 
-void Background::setGroundHeight(float newground)
+void Background::move(const sf::Vector2f &offset)
 {
-    groundHeight = newground;
-}
-
-float Background::getGroundHeight() const
-{
-    return groundHeight - roadSize.y / 2;
-}
-
-void Background::setRoadSize(const sf::Vector2f &size)
-{
-    roadSize = size;
-}
-
-const sf::Vector2f &Background::getRoadSize() const
-{
-    return roadSize;
+    move(offset.x, offset.y);
 }
 
 void Background::setCloudsAmount(int amount)
@@ -113,6 +100,11 @@ void Background::setCloudsAmount(int amount)
 int Background::getCloudsAmount() const
 {
     return cloudsAmount;
+}
+
+void Background::setCloudSize(float x, float y)
+{
+    cloudSize = {x, y};
 }
 
 void Background::setCloudSize(const sf::Vector2f &size)
@@ -135,6 +127,11 @@ int Background::getTreesAmount() const
     return treesAmount;
 }
 
+void Background::setTreeSize(float x, float y)
+{
+    treeSize = {x, y};
+}
+
 void Background::setTreeSize(const sf::Vector2f &size)
 {
     treeSize = size;
@@ -143,6 +140,11 @@ void Background::setTreeSize(const sf::Vector2f &size)
 const sf::Vector2f &Background::getTreeSize() const
 {
     return treeSize;
+}
+
+float Background::getGround() const
+{
+    return road.getPosition().y - road.getSize().y / 2;
 }
 
 void Background::loadCloudTexture(const sf::String &file)

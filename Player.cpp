@@ -3,10 +3,9 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Player.hpp"
 
-Player::Player(const sf::String &file)
+Player::Player(/*const std::vector<std::string> &,*/ const std::string &slidePath)
 {
-    texture.loadFromFile(file);
-    setTexture(texture);
+    slideTexture.loadFromFile(slidePath);
 }
 Player::~Player() {}
 
@@ -48,4 +47,13 @@ void Player::setJumpHeight(float h)
 float Player::getJumpHeight() const
 {
     return jumpHeight;
+}
+
+sf::Vector2f Player::getPosition() const
+{
+    return model.getPosition();
+}
+sf::Vector2f Player::getSize() const
+{
+    return model.getSize();
 }

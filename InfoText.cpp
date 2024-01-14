@@ -3,58 +3,45 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "InfoText.hpp"
 
-InfoText::InfoText(const sf::Vector2u &windowSize)
+InfoText::InfoText(sf::RenderWindow *windowH) : windowHandler(windowH)
 {
+    update();
+}
+
+void InfoText::update()
+{
+    if (!windowHandler)
+        return;
+    auto windowSize = windowHandler->getSize();
     background.setSize(sf::Vector2f(windowSize.x * 0.5, windowSize.y * 0.5));
     background.setOutlineColor(sf::Color::Red);
+    background.setOutlineThickness(5.f);
     background.setFillColor(sf::Color::Black);
-    setTitleCharacterSize(background.getSize().y * 0.35);
-    setInfoCharacterSize(background.getSize().y * 0.2);
     background.setOrigin(background.getSize().x / 2, background.getSize().y / 2);
-    setPosition(windowSize.x / 2, windowSize.y * 0.1f + background.getSize().y / 2);
+    title.setCharacterSize(background.getSize().y * 0.35);
+    content.setCharacterSize(background.getSize().y * 0.2);
 }
 
-InfoText::~InfoText() {}
-
-void InfoText::draw(sf::RenderWindow &window)
+void InfoText::draw()
 {
-    window.draw(background);
-    window.draw(title);
-    window.draw(info);
-}
-
-void InfoText::setFont(const sf::Font &font)
-{
-    title.setFont(font);
-    info.setFont(font);
+    if (windowHandler and isActive)
+    {
+        windowHandler->draw(background);
+        windowHandler->draw(title);
+        windowHandler->draw(content);
+    }
 }
 
 void InfoText::setPosition(float x, float y)
 {
     background.setPosition(x, y);
     title.setPosition(x, y - background.getSize().y * 0.4f);
-    info.setPosition(x, title.getPosition().y + 1.5f * title.getCharacterSize());
+    content.setPosition(x, title.getPosition().y + 1.5f * title.getCharacterSize());
 }
 
-void InfoText::setTextColor(const sf::Color &color)
+void InfoText::setPosition(const sf::Vector2f &pos)
 {
-    title.setFillColor(color);
-    info.setFillColor(color);
-}
-
-void InfoText::setBackgroundColor(const sf::Color &color)
-{
-    background.setFillColor(color);
-}
-
-void InfoText::setTitleCharacterSize(unsigned size)
-{
-    title.setCharacterSize(size);
-}
-
-void InfoText::setInfoCharacterSize(unsigned size)
-{
-    info.setCharacterSize(size);
+    setPosition(pos.x, pos.y);
 }
 
 void InfoText::setTitleText(const sf::String &text)
@@ -63,8 +50,25 @@ void InfoText::setTitleText(const sf::String &text)
     title.setOrigin(title.getLocalBounds().width / 2, title.getLocalBounds().height / 2);
 }
 
-void InfoText::setInfoText(const sf::String &text)
+void InfoText::setContentText(const sf::String &text)
 {
-    info.setString(text);
-    info.setOrigin(info.getLocalBounds().width / 2, info.getLocalBounds().height / 2);
+    content.setString(text);
+    content.setOrigin(content.getLocalBounds().width / 2, content.getLocalBounds().height / 2);
+}
+
+void InfoText::setGeneralFont(const sf::Font &font)
+{
+    title.setFont(font);
+    content.setFont(font);
+}
+
+void InfoText::setWindowHandler(sf::RenderWindow *windowH)
+{
+    windowHandler = windowH;
+    update();
+}
+
+sf::RenderWindow *InfoText::getWindowHandler()
+{
+    return windowHandler;
 }

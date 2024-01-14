@@ -9,11 +9,11 @@ Enemies::Enemies(sf::Vector2u windowSize) : windowSize(std::move(windowSize)) {}
 
 void Enemies::init()
 {
-    groundEnemySize = sf::Vector2f(windowSize.x * 0.1f, windowSize.y * 0.1f);
+    groundEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
     distBetweenGroundEnemies = playerSize.x + groundEnemySize.x;
     groundEnemiesAmount = windowSize.x / distBetweenGroundEnemies + 2;
 
-    flyingEnemySize = sf::Vector2f(windowSize.x * 0.1f, windowSize.y * 0.1f);
+    flyingEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
     distBetweenFlyingEnemies = playerSize.x + flyingEnemySize.x;
     flyingEnemiesAmount = windowSize.x / distBetweenFlyingEnemies + 2;
 
@@ -107,7 +107,7 @@ bool Enemies::spawn(float elapsedTime)
         auto &groundEnemy = *availableGroundEnemies.front();
         busyGroundEnemies.push_back(availableGroundEnemies.front());
         uncheckedGroundEnemies.push_back(availableGroundEnemies.front());
-        groundEnemy.setPosition(windowSize.x + groundEnemy.getSize().x / 2, groundHeight - groundEnemy.getSize().y * 0.8);
+        groundEnemy.setPosition(windowSize.x + groundEnemy.getSize().x / 2.f, groundHeight - groundEnemy.getSize().y / 2.0f);
         availableGroundEnemies.pop_front();
     }
     else
@@ -115,7 +115,7 @@ bool Enemies::spawn(float elapsedTime)
         auto &flyingEnemy = *availableFlyingEnemies.front();
         busyFlyingEnemies.push_back(availableFlyingEnemies.front());
         uncheckedFlyingEnemies.push_back(availableFlyingEnemies.front());
-        flyingEnemy.setPosition(windowSize.x + flyingEnemy.getSize().x / 2, groundHeight - 5 * flyingEnemy.getSize().y * 0.8);
+        flyingEnemy.setPosition(windowSize.x + flyingEnemy.getSize().x / 2.f, groundHeight - playerSize.y / 2.f - flyingEnemy.getSize().y / 2.f);
         availableFlyingEnemies.pop_front();
     }
     return true;
