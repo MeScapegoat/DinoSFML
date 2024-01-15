@@ -5,10 +5,13 @@
 
 #include <iostream>
 
-Enemies::Enemies(sf::Vector2u windowSize) : windowSize(std::move(windowSize)) {}
+Enemies::Enemies(sf::RenderWindow *windowH, Player *playerH) : windowHandler(windowH), playerHandler(playerH) {}
 
 void Enemies::init()
 {
+    auto windowSize = windowHandler->getSize();
+    auto playerSize = playerHandler->getSize();
+
     groundEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
     distBetweenGroundEnemies = playerSize.x + groundEnemySize.x;
     groundEnemiesAmount = windowSize.x / distBetweenGroundEnemies + 2;
@@ -20,11 +23,12 @@ void Enemies::init()
     uncheckedGroundEnemies.clear();
     busyGroundEnemies.clear();
     groundEnemies.clear();
+
     groundEnemies.reserve(groundEnemiesAmount);
     unsigned textureID = 0;
     for (auto n = 0; n < groundEnemiesAmount; ++n)
     {
-        AnimatedModel groundEnemy;
+        AnimatedModel groundEnemy(windowHandler);
         groundEnemy.setAnimations(&groundEnemiesTextures);
         if (textureID == groundEnemiesTextures.size())
             textureID = 0;
@@ -41,7 +45,7 @@ void Enemies::init()
     textureID = 0;
     for (auto n = 0; n < flyingEnemiesAmount; ++n)
     {
-        AnimatedModel flyingEnemy;
+        AnimatedModel flyingEnemy(windowHandler);
         flyingEnemy.setAnimations(&flyingEnemiesTextures);
         if (textureID == flyingEnemiesTextures.size())
             textureID = 0;
@@ -57,46 +61,52 @@ void Enemies::init()
     groundAnimationInterval = groundAnimationDistance / 200;
 }
 
-Enemies::~Enemies() {}
-
-void Enemies::draw(sf::RenderWindow &window) const
+void Enemies::draw()
 {
     for (auto &groundEnemy : busyGroundEnemies)
-        groundEnemy->draw(window);
+        groundEnemy->draw();
 
     for (auto &flyingEnemy : busyFlyingEnemies)
-        flyingEnemy->draw(window);
+        flyingEnemy->draw();
 }
 
-void Enemies::move(const sf::Vector2f &offset)
+void Enemies::move(float x, float y)
 {
     for (auto it = busyGroundEnemies.begin(); it < busyGroundEnemies.end(); ++it)
     {
         auto groundEnemyP = *it;
-        if (groundEnemyP->getPosition().x + groundEnemyP->getSize().x / 2 <= 0)
+        if (groundEnemyP->sprite.getPosition().x + groundEnemyP->getSize().x / 2 <= 0)
         {
             availableGroundEnemies.push_back(groundEnemyP);
             it = busyGroundEnemies.erase(it);
         }
         else
-            groundEnemyP->move(offset);
+            groundEnemyP->sprite.move(x, y);
     }
 
     for (auto it = busyFlyingEnemies.begin(); it < busyFlyingEnemies.end(); ++it)
     {
         auto flyingEnemyP = *it;
-        if (flyingEnemyP->getPosition().x + flyingEnemyP->getSize().x / 2 <= 0)
+        if (flyingEnemyP->sprite.getPosition().x + flyingEnemyP->getSize().x / 2 <= 0)
         {
             availableFlyingEnemies.push_back(flyingEnemyP);
             it = busyFlyingEnemies.erase(it);
         }
         else
-            flyingEnemyP->move(offset);
+            flyingEnemyP->sprite.move(x, y);
     }
+}
+
+void Enemies::move(const sf::Vector2f &offset)
+{
+    move(offset.x, offset.y);
 }
 
 bool Enemies::spawn(float elapsedTime)
 {
+    auto windowSize = windowHandler->getSize();
+    auto playerSize = playerHandler->getSize();
+
     spawnTimer += elapsedTime;
     if (spawnTimer < spawnInterval)
         return false;
@@ -141,33 +151,44 @@ float Enemies::getGroundHeight() const
     return groundHeight;
 }
 
-bool Enemies::checkCrash(const Player &player) const
+void Enemies::setWindowHandler(sf::RenderWindow *windowH)
 {
-    auto pR = player.getGlobalBounds();
+    windowHandler = windowH;
+    // обработать все модели размеры и прочее в соответствии с новым окном
+}
+
+sf::RenderWindow *Enemies::getWindowHandler()
+{
+    return windowHandler;
+}
+
+bool Enemies::checkCrash() const
+{
+    auto pR = playerHandler->sprite.getGlobalBounds();
 
     for (const auto &flying : busyFlyingEnemies)
     {
-        auto eR = flying->getGlobalBounds();
+        auto eR = flying->sprite.getGlobalBounds();
         if (pR.intersects(eR))
             return true;
     }
 
     for (const auto &ground : busyGroundEnemies)
     {
-        auto eR = ground->getGlobalBounds();
+        auto eR = ground->sprite.getGlobalBounds();
         if (pR.intersects(eR))
             return true;
     }
     return false;
 }
 
-bool Enemies::checkOvercome(const Player &player)
+bool Enemies::checkOvercome()
 {
-    auto playerborder = player.getPosition().x - player.getSize().x / 2;
+    auto playerborder = playerHandler->sprite.getPosition().x - playerHandler->getSize().x / 2;
     if (!uncheckedFlyingEnemies.empty())
     {
         auto flying = uncheckedFlyingEnemies.front();
-        auto enemyborder = flying->getPosition().x + flying->getSize().x / 2;
+        auto enemyborder = flying->sprite.getPosition().x + flying->getSize().x / 2;
         if (enemyborder < playerborder)
         {
             uncheckedFlyingEnemies.pop_front();
@@ -178,7 +199,7 @@ bool Enemies::checkOvercome(const Player &player)
     if (!uncheckedGroundEnemies.empty())
     {
         auto ground = uncheckedGroundEnemies.front();
-        auto enemyborder = ground->getPosition().x + ground->getSize().x / 2;
+        auto enemyborder = ground->sprite.getPosition().x + ground->getSize().x / 2;
         if (enemyborder < playerborder)
         {
             uncheckedGroundEnemies.pop_front();
@@ -187,16 +208,6 @@ bool Enemies::checkOvercome(const Player &player)
     }
 
     return false;
-}
-
-void Enemies::setPlayerSize(sf::Vector2f size)
-{
-    playerSize = size;
-}
-
-sf::Vector2f Enemies::getPlayerSize() const
-{
-    return playerSize;
 }
 
 void Enemies::loadFlyingEnemiesTextures(const std::vector<sf::String> &files)

@@ -156,3 +156,14 @@ void Background::loadTreeTexture(const sf::String &file)
 {
     treeTexture.loadFromFile(file);
 }
+
+void Background::setWindowHandler(sf::RenderWindow *windowH)
+{
+    windowHandler = windowH;
+    // обработать все модели размеры и прочее в соответствии с новым окном
+}
+
+sf::RenderWindow *Background::getWindowHandler()
+{
+    return windowHandler;
+}

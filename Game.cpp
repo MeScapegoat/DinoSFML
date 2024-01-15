@@ -12,7 +12,7 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
       scoreboard(&window),
       background(&window),
       player("../assets/proto.png"),
-      enemies(window.getSize())
+      enemies(&window, &player)
 {
     const auto &size = window.getSize();
 
@@ -31,7 +31,6 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     background.loadCloudTexture("../assets/cloud.png");                    // Текстура облака
     background.loadTreeTexture("../assets/tree.png");                      // Текстура дерева
 
-    enemies.setPlayerSize(player.getSize());
     enemies.loadFlyingEnemiesTextures(std::vector<sf::String>{"../assets/batup.png", "../assets/batdown.png"});
     enemies.loadGroundEnemiesTextures(std::vector<sf::String>{"../assets/wormup.png", "../assets/wormdown.png"});
     enemies.setGroundHeight(background.getGround());
@@ -93,8 +92,8 @@ void Game::render()
 
     background.draw();
     scoreboard.draw();
-    enemies.draw(window);
-    player.draw(window);
+    enemies.draw();
+    player.draw();
 
     pausedText.draw();
     gameOverText.draw();
@@ -169,14 +168,14 @@ void Game::update()
     }
     //
 
-    if (enemies.checkCrash(player))
+    if (enemies.checkCrash())
     {
         // isGameOver = true;
         // gameOverText.toShow = true;
         // return;
     }
 
-    if (enemies.checkOvercome(player))
+    if (enemies.checkOvercome())
         scoreboard.increaseScore(1);
 
     if (enemies.spawn(elapsedTime))
