@@ -24,7 +24,7 @@ void Background::init()
         Model cloud(windowHandler);
         cloud.setTexture(cloudTexture);
         cloud.setSize(cloudSize);
-        cloud.setPosition(nextCloudPosition);
+        cloud.sprite.setPosition(nextCloudPosition);
         nextCloudPosition += distBetweenClouds;
         distBetweenClouds.y *= -1;
         clouds.push_back(std::move(cloud));
@@ -39,7 +39,7 @@ void Background::init()
         Model tree(windowHandler);
         tree.setTexture(treeTexture);
         tree.setSize(treeSize);
-        tree.setPosition(nextTreePosition);
+        tree.sprite.setPosition(nextTreePosition);
         nextTreePosition += distBetweenTrees;
         trees.push_back(std::move(tree));
     }
@@ -69,7 +69,7 @@ void Background::move(float x, float y)
             cloud.sprite.move(offset);
         else
         {
-            cloud.setPosition(nextCloudPosition);
+            cloud.sprite.setPosition(nextCloudPosition);
             nextCloudPosition += distBetweenClouds;
             distBetweenClouds.y *= -1;
         }
@@ -81,7 +81,7 @@ void Background::move(float x, float y)
             tree.sprite.move(offset);
         else
         {
-            tree.setPosition(nextTreePosition);
+            tree.sprite.setPosition(nextTreePosition);
             nextTreePosition += distBetweenTrees;
         }
     }

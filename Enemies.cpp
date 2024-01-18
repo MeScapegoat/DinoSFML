@@ -10,7 +10,7 @@ Enemies::Enemies(sf::RenderWindow *windowH, Player *playerH) : windowHandler(win
 void Enemies::init()
 {
     auto windowSize = windowHandler->getSize();
-    auto playerSize = playerHandler->getSize();
+    auto playerSize = playerHandler->model.getSize();
 
     groundEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
     distBetweenGroundEnemies = playerSize.x + groundEnemySize.x;
@@ -54,11 +54,6 @@ void Enemies::init()
         flyingEnemies.push_back(flyingEnemy);
         availableFlyingEnemies.push_back(&flyingEnemies[n]);
     }
-    flyingAnimationDistance = flyingEnemies.front().getSize().x * 1;
-    groundAnimationDistance = groundEnemies.front().getSize().x * 1;
-
-    flyingAnimationInterval = flyingAnimationDistance / 200;
-    groundAnimationInterval = groundAnimationDistance / 200;
 }
 
 void Enemies::draw()
@@ -105,7 +100,7 @@ void Enemies::move(const sf::Vector2f &offset)
 bool Enemies::spawn(float elapsedTime)
 {
     auto windowSize = windowHandler->getSize();
-    auto playerSize = playerHandler->getSize();
+    auto playerSize = playerHandler->model.getSize();
 
     spawnTimer += elapsedTime;
     if (spawnTimer < spawnInterval)
@@ -117,7 +112,7 @@ bool Enemies::spawn(float elapsedTime)
         auto &groundEnemy = *availableGroundEnemies.front();
         busyGroundEnemies.push_back(availableGroundEnemies.front());
         uncheckedGroundEnemies.push_back(availableGroundEnemies.front());
-        groundEnemy.setPosition(windowSize.x + groundEnemy.getSize().x / 2.f, groundHeight - groundEnemy.getSize().y / 2.0f);
+        groundEnemy.sprite.setPosition(windowSize.x + groundEnemy.getSize().x / 2.f, groundHeight - groundEnemy.getSize().y / 2.0f);
         availableGroundEnemies.pop_front();
     }
     else
@@ -125,7 +120,7 @@ bool Enemies::spawn(float elapsedTime)
         auto &flyingEnemy = *availableFlyingEnemies.front();
         busyFlyingEnemies.push_back(availableFlyingEnemies.front());
         uncheckedFlyingEnemies.push_back(availableFlyingEnemies.front());
-        flyingEnemy.setPosition(windowSize.x + flyingEnemy.getSize().x / 2.f, groundHeight - playerSize.y / 2.f - flyingEnemy.getSize().y / 2.f);
+        flyingEnemy.sprite.setPosition(windowSize.x + flyingEnemy.getSize().x / 2.f, groundHeight - playerSize.y / 2.f - flyingEnemy.getSize().y / 2.f);
         availableFlyingEnemies.pop_front();
     }
     return true;
@@ -164,7 +159,7 @@ sf::RenderWindow *Enemies::getWindowHandler()
 
 bool Enemies::checkCrash() const
 {
-    auto pR = playerHandler->sprite.getGlobalBounds();
+    auto pR = playerHandler->model.sprite.getGlobalBounds();
 
     for (const auto &flying : busyFlyingEnemies)
     {
@@ -184,7 +179,7 @@ bool Enemies::checkCrash() const
 
 bool Enemies::checkOvercome()
 {
-    auto playerborder = playerHandler->sprite.getPosition().x - playerHandler->getSize().x / 2;
+    auto playerborder = playerHandler->model.sprite.getPosition().x - playerHandler->model.getSize().x / 2;
     if (!uncheckedFlyingEnemies.empty())
     {
         auto flying = uncheckedFlyingEnemies.front();
@@ -210,45 +205,27 @@ bool Enemies::checkOvercome()
     return false;
 }
 
-void Enemies::loadFlyingEnemiesTextures(const std::vector<sf::String> &files)
+void Enemies::loadFlyingEnemiesTextures(const std::vector<sf::String> &paths)
 {
-    for (auto &file : files)
-    {
-        sf::Texture texture;
-        texture.loadFromFile(file);
-        flyingEnemiesTextures.push_back(texture);
-    }
+    flyingEnemiesTextures.resize(paths.size());
+    for (auto n = 0; n < paths.size(); ++n)
+        flyingEnemiesTextures[n].loadFromFile(paths[n]);
 }
 
-void Enemies::loadGroundEnemiesTextures(const std::vector<sf::String> &files)
+void Enemies::loadGroundEnemiesTextures(const std::vector<sf::String> &paths)
 {
-    for (auto &file : files)
-    {
-        sf::Texture texture;
-        texture.loadFromFile(file);
-        groundEnemiesTextures.push_back(texture);
-    }
+    groundEnemiesTextures.resize(paths.size());
+    for (auto n = 0; n < paths.size(); ++n)
+        groundEnemiesTextures[n].loadFromFile(paths[n]);
 }
 
-void Enemies::updateAnimations(float elapsedTime, float velocity)
+void Enemies::updateAnimations(float elapsedTime, float worldVelocity)
 {
-    flyingAnimationTimer += elapsedTime;
-    groundAnimationTimer += elapsedTime;
-    if (flyingAnimationTimer > flyingAnimationInterval)
-    {
-        flyingAnimationTimer -= flyingAnimationInterval;
-        flyingAnimationInterval = flyingAnimationDistance / velocity;
-        for (auto &Enemy : busyGroundEnemies)
-            Enemy->updateAnimation();
-    }
+    for (auto &Enemy : busyGroundEnemies)
+        Enemy->updateAnimation(elapsedTime, worldVelocity);
 
-    if (groundAnimationTimer > groundAnimationInterval)
-    {
-        groundAnimationTimer -= groundAnimationInterval;
-        groundAnimationInterval = groundAnimationDistance / velocity;
-        for (auto &Enemy : busyFlyingEnemies)
-            Enemy->updateAnimation();
-    }
+    for (auto &Enemy : busyFlyingEnemies)
+        Enemy->updateAnimation(elapsedTime, worldVelocity);
 }
 
 void Enemies::setSpawnTimer(float value)

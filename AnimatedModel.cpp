@@ -14,10 +14,20 @@ void AnimatedModel::setAnimations(std::vector<sf::Texture> *ani)
     animations = ani;
 }
 
-void AnimatedModel::updateAnimation()
+void AnimatedModel::updateAnimation(float elapsedTime, float worldVelocity)
 {
-    if (currentAnimationID >= animations->size())
+    if (!animationInterval)
+    {
+        animationDistance = getSize().x / 2.0f;
+        animationInterval = animationDistance / worldVelocity;
+    }
+    animationTimer += elapsedTime;
+
+    if (animationTimer < animationInterval)
+        return;
+    animationTimer -= animationInterval;
+    animationInterval = animationDistance / worldVelocity;
+    if (currentAnimationID == animations->size())
         currentAnimationID = 0;
-    auto &texture = animations->at(currentAnimationID++);
-    setTexture(texture);
+    setTexture(animations->at(currentAnimationID++));
 }

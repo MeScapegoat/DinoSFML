@@ -11,7 +11,7 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
       pausedText(&window),
       scoreboard(&window),
       background(&window),
-      player("../assets/proto.png"),
+      player(&window),
       enemies(&window, &player)
 {
     const auto &size = window.getSize();
@@ -22,23 +22,21 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     gameOverText.setPosition(window.getSize().x / 2, window.getSize().y * 0.4f);
 
     // Внешний вид
-    player.setSize(size.x * 0.06f, size.y * 0.2f);
+    background.loadCloudTexture("../assets/cloud.png");                                                           // Текстура облака
+    background.loadTreeTexture("../assets/tree.png");                                                             // Текстура дерева
+    enemies.loadFlyingEnemiesTextures(std::vector<sf::String>{"../assets/batup.png", "../assets/batdown.png"});   // анимация летучей мыши
+    enemies.loadGroundEnemiesTextures(std::vector<sf::String>{"../assets/wormup.png", "../assets/wormdown.png"}); // анимация червяка
+    player.loadSlideTexture("../assets/slide.png");                                                               // текстура скольжения
+    player.loadRunningTextures(std::vector<sf::String>{"../assets/protoStep.png", "../assets/proto.png"});        // анимация бега
 
     background.setCloudsAmount(3);                                         // кол-во облаков
     background.setCloudSize(sf::Vector2f(size.x * 0.12f, size.y * 0.08f)); // размер облаков
     background.setTreesAmount(11);                                         // кол-во деревьев
     background.setTreeSize(sf::Vector2f(size.x * 0.06f, size.y * 0.3f));   // размер деревьев
-    background.loadCloudTexture("../assets/cloud.png");                    // Текстура облака
-    background.loadTreeTexture("../assets/tree.png");                      // Текстура дерева
 
-    enemies.loadFlyingEnemiesTextures(std::vector<sf::String>{"../assets/batup.png", "../assets/batdown.png"});
-    enemies.loadGroundEnemiesTextures(std::vector<sf::String>{"../assets/wormup.png", "../assets/wormdown.png"});
-    enemies.setGroundHeight(background.getGround());
     font.loadFromFile("../LOST_LATE.ttf");
 
     scoreboard.setFont(font);
-    scoreboard.setCharacterSize(size.y - background.road.getPosition().y);
-    scoreboard.setOrigin(0, scoreboard.getCharacterSize());
     scoreboard.setFillColor(sf::Color::Red);
 
     pausedText.setGeneralFont(font);
@@ -58,7 +56,7 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     gameOverText.content.setFillColor(sf::Color::Red);
 
     // Геймплейное
-    player.setJumpHeight(size.y * 0.5f);
+    player.jumpHeight = size.y * 0.5f;
     isPaused = true;
     pausedText.isActive = true;
 
@@ -69,16 +67,24 @@ void Game::restart()
 {
     const auto &size = window.getSize();
     background.init();
+
+    enemies.setGroundHeight(background.getGround());
+    player.groundLevel = background.getGround();
+    scoreboard.setCharacterSize(size.y - background.road.getPosition().y);
+    scoreboard.setOrigin(0, scoreboard.getCharacterSize());
+
     enemies.init();
     worldVelocity = 200;
     maxWorldVelocity = worldVelocity * 5;
     worldVelocityStep = (maxWorldVelocity - worldVelocity) / 100;
     elapsedTime = 0;
 
-    player.setPosition(size.x * 0.15f + player.getSize().x / 2,
-                       background.getGround() - player.getSize().y / 2);
-    player.setJumpVelocity(size.y * 0.001f * -1);
-    player.setJumpVelocityStep(player.getJumpVelocity() / 100);
+    player.model.sprite.setPosition(size.x * 0.15f + player.model.getSize().x / 2,
+                                    background.getGround() - player.model.getSize().y / 2);
+    player.jumpVelocity = size.y * 0.001f;
+    player.maxJumpVelocity = player.jumpVelocity * 10;
+    player.jumpVelocityStep = (player.maxJumpVelocity - player.jumpVelocity) / 100;
+
     enemies.setMinSpawnInterval(std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity);
     scoreboard.setScore(0);
 }
@@ -93,12 +99,19 @@ void Game::render()
     background.draw();
     scoreboard.draw();
     enemies.draw();
-    player.draw();
+    player.model.draw();
+
+    // sf::Vector2f tsize = {player.model.sprite.getTexture()->getSize().x * player.model.sprite.getScale().x,
+    //                       player.model.sprite.getTexture()->getSize().y * player.model.sprite.getScale().y};
+    // sf::RectangleShape s(tsize);
+    // s.setFillColor(sf::Color::Red);
+    // s.setOrigin(s.getSize().x / 2, s.getSize().y / 2);
+    // s.setPosition(player.model.sprite.getPosition());
+    // window.draw(s);
 
     pausedText.draw();
     gameOverText.draw();
 
-    // t.draw();
     window.display();
 }
 
@@ -130,6 +143,10 @@ void Game::update()
                 isPaused = !isPaused;
                 pausedText.isActive = !pausedText.isActive;
                 break;
+            case sf::Keyboard::W:
+            case sf::Keyboard::Up:
+                player.jump();
+                break;
 
             default:
                 break;
@@ -144,28 +161,9 @@ void Game::update()
         return;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) or sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-    {
-        if (!player.getCurrentJumpVelocity())
-        {
-            player.setScale(2.f, 0.5f);
-            player.setPosition(player.getPosition().x, background.getGround() - player.getSize().y / 2);
-        }
-    }
+        player.setSliding(true);
     else
-    {
-        if (!player.getCurrentJumpVelocity())
-        {
-            player.setScale(1.f, 1.f);
-            player.setPosition(player.getPosition().x, background.getGround() - player.getSize().y / 2);
-        }
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) or sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-    {
-        if (player.getCurrentJumpVelocity() > 0)
-            player.setCurrentJumpVelocity(-1 * player.getJumpVelocity());
-        else
-            player.setCurrentJumpVelocity(player.getJumpVelocity());
-    }
+        player.setSliding(false);
     //
 
     if (enemies.checkCrash())
@@ -184,26 +182,15 @@ void Game::update()
         if (worldVelocity < maxWorldVelocity)
         {
             worldVelocity += worldVelocityStep;
-            player.setJumpVelocity(player.getJumpVelocity() + player.getJumpVelocityStep());
+            player.jumpVelocity += player.jumpVelocityStep;
         }
     }
     enemies.updateAnimations(elapsedTime, worldVelocity);
 
-    if (player.getCurrentJumpVelocity() < 0)
-    {
-        if (player.getPosition().y + player.getSize().y / 2 < player.getJumpHeight())
-            player.setCurrentJumpVelocity(player.getCurrentJumpVelocity() * -1);
-    }
-    else if (player.getCurrentJumpVelocity() > 0)
-    {
-        if (player.getPosition().y + player.getSize().y / 2 > background.getGround())
-            player.setCurrentJumpVelocity(0);
-    }
-
     auto speed = worldVelocity * elapsedTime * -1.f;
     background.move(sf::Vector2f(speed, 0));
     enemies.move(sf::Vector2f(speed, 0));
-    player.move(sf::Vector2f(0, player.getCurrentJumpVelocity()));
+    player.move(elapsedTime, worldVelocity);
 }
 
 void Game::run()
@@ -214,5 +201,3 @@ void Game::run()
         render();
     }
 }
-
-Game::~Game() {}
