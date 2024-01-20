@@ -11,8 +11,8 @@ void Background::init()
 {
     auto windowSize = windowHandler->getSize();
     road.setSize(sf::Vector2f(windowSize.x, windowSize.y * 0.05f));
-    road.setPosition(windowSize.x / 2, windowSize.y * 0.9f);
     road.setOrigin(road.getSize().x / 2, road.getSize().y / 2);
+    road.setPosition(windowSize.x / 2, windowSize.y * 0.9f);
 
     clouds.clear();
     clouds.reserve(cloudsAmount + 1);

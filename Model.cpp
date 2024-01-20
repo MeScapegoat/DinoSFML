@@ -20,7 +20,7 @@ void Model::setSize(float x, float y)
     sprite.setScale(normalScale);
 }
 
-void Model::setSize(sf::Vector2f size)
+void Model::setSize(const sf::Vector2f &size)
 {
     setSize(size.x, size.y);
 }

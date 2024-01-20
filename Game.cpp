@@ -12,7 +12,8 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
       scoreboard(&window),
       background(&window),
       player(&window),
-      enemies(&window, &player)
+      enemies(&window, &player),
+      isGameOver(false)
 {
     const auto &size = window.getSize();
 
@@ -22,12 +23,11 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     gameOverText.setPosition(window.getSize().x / 2, window.getSize().y * 0.4f);
 
     // Внешний вид
-    background.loadCloudTexture("../assets/cloud.png");                                                           // Текстура облака
-    background.loadTreeTexture("../assets/tree.png");                                                             // Текстура дерева
-    enemies.loadFlyingEnemiesTextures(std::vector<sf::String>{"../assets/batup.png", "../assets/batdown.png"});   // анимация летучей мыши
-    enemies.loadGroundEnemiesTextures(std::vector<sf::String>{"../assets/wormup.png", "../assets/wormdown.png"}); // анимация червяка
-    player.loadSlideTexture("../assets/slide.png");                                                               // текстура скольжения
-    player.loadRunningTextures(std::vector<sf::String>{"../assets/protoStep.png", "../assets/proto.png"});        // анимация бега
+    background.loadCloudTexture("../Textures/cloud.png");     // Текстура облака
+    background.loadTreeTexture("../Textures/tree.png");       // Текстура дерева
+    enemies.loadFlyingEnemiesTexture("../Textures/bat.png");  // текстуры летучей мыши
+    enemies.loadGroundEnemiesTexture("../Textures/worm.png"); // текстуры червяка
+    player.loadTexture("../Textures/player.png");             // текстура игрока
 
     background.setCloudsAmount(3);                                         // кол-во облаков
     background.setCloudSize(sf::Vector2f(size.x * 0.12f, size.y * 0.08f)); // размер облаков
@@ -100,14 +100,6 @@ void Game::render()
     scoreboard.draw();
     enemies.draw();
     player.model.draw();
-
-    // sf::Vector2f tsize = {player.model.sprite.getTexture()->getSize().x * player.model.sprite.getScale().x,
-    //                       player.model.sprite.getTexture()->getSize().y * player.model.sprite.getScale().y};
-    // sf::RectangleShape s(tsize);
-    // s.setFillColor(sf::Color::Red);
-    // s.setOrigin(s.getSize().x / 2, s.getSize().y / 2);
-    // s.setPosition(player.model.sprite.getPosition());
-    // window.draw(s);
 
     pausedText.draw();
     gameOverText.draw();
@@ -185,12 +177,12 @@ void Game::update()
             player.jumpVelocity += player.jumpVelocityStep;
         }
     }
-    enemies.updateAnimations(elapsedTime, worldVelocity);
+    enemies.updateAnimations(elapsedTime);
 
     auto speed = worldVelocity * elapsedTime * -1.f;
     background.move(sf::Vector2f(speed, 0));
     enemies.move(sf::Vector2f(speed, 0));
-    player.move(elapsedTime, worldVelocity);
+    player.move(elapsedTime);
 }
 
 void Game::run()

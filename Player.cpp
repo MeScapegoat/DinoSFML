@@ -3,28 +3,29 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Player.hpp"
 
+#include <iostream>
+
 Player::Player(sf::RenderWindow *windowH) : model(windowH),
                                             jumpState(0),
-                                            isSliding(false)
+                                            isSliding(false),
+                                            run({0, 0}, 2, .5f),
+                                            slide({0, TEXTURE_SIZE.y}, 1, 0)
 {
     auto windowSize = windowH->getSize();
+
     runningSize = {windowSize.x * 0.06f, windowSize.y * 0.2f};
     slidingSize = {runningSize.y, runningSize.x};
+
     model.setSize(runningSize);
-    model.setAnimations(&runningTextures);
+    model.setCurrentAnimation(run);
 }
 
-void Player::move(float elapsedTime, float worldVelocity)
+void Player::move(float elapsedTime)
 {
     if (isSliding)
         return;
 
-    if (!jumpState)
-    {
-        model.updateAnimation(elapsedTime, worldVelocity);
-        return;
-    }
-
+    model.updateAnimation(elapsedTime);
     auto pos = model.sprite.getPosition().y;
     if (jumpState < 0 and pos <= jumpHeight - model.getSize().y / 2)
         jumpState = 1;
@@ -40,17 +41,10 @@ void Player::jump()
         jumpState = -1;
 }
 
-void Player::loadSlideTexture(const std::string &path)
+void Player::loadTexture(const std::string &path)
 {
-    slideTexture.loadFromFile(path);
-}
-
-void Player::loadRunningTextures(const std::vector<sf::String> &paths)
-{
-    runningTextures.resize(paths.size());
-    for (auto n = 0; n < paths.size(); ++n)
-        runningTextures[n].loadFromFile(paths[n]);
-    model.updateAnimation(0, 1);
+    texture.loadFromFile(path);
+    model.setTexture(texture);
 }
 
 void Player::setSliding(bool flag)
@@ -63,12 +57,16 @@ void Player::setSliding(bool flag)
     isSliding = flag;
     if (isSliding)
     {
-        model.setTexture(slideTexture);
+        model.setCurrentAnimation(slide);
         model.setSize(slidingSize);
+
+        model.sprite.setPosition(model.sprite.getPosition().x, groundLevel - model.getSize().y * 0.3);
     }
     else
     {
+        model.setCurrentAnimation(run);
         model.setSize(runningSize);
+
+        model.sprite.setPosition(model.sprite.getPosition().x, groundLevel - model.getSize().y * 0.5);
     }
-    model.sprite.setPosition(model.sprite.getPosition().x, groundLevel - model.getSize().y / 2);
 }

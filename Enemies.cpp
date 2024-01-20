@@ -5,7 +5,11 @@
 
 #include <iostream>
 
-Enemies::Enemies(sf::RenderWindow *windowH, Player *playerH) : windowHandler(windowH), playerHandler(playerH) {}
+Enemies::Enemies(sf::RenderWindow *windowH, Player *playerH) : windowHandler(windowH), playerHandler(playerH),
+                                                               wormAnim({0, 0}, 2, 0.5f),
+                                                               batAnim({0, 0}, 2, 0.5f)
+{
+}
 
 void Enemies::init()
 {
@@ -29,10 +33,8 @@ void Enemies::init()
     for (auto n = 0; n < groundEnemiesAmount; ++n)
     {
         AnimatedModel groundEnemy(windowHandler);
-        groundEnemy.setAnimations(&groundEnemiesTextures);
-        if (textureID == groundEnemiesTextures.size())
-            textureID = 0;
-        groundEnemy.setTexture(groundEnemiesTextures[textureID++]);
+        groundEnemy.setCurrentAnimation(wormAnim);
+        groundEnemy.setTexture(groundEnemiesTexture);
         groundEnemy.setSize(groundEnemySize);
         groundEnemies.push_back(std::move(groundEnemy));
         availableGroundEnemies.push_back(&groundEnemies[n]);
@@ -46,10 +48,8 @@ void Enemies::init()
     for (auto n = 0; n < flyingEnemiesAmount; ++n)
     {
         AnimatedModel flyingEnemy(windowHandler);
-        flyingEnemy.setAnimations(&flyingEnemiesTextures);
-        if (textureID == flyingEnemiesTextures.size())
-            textureID = 0;
-        flyingEnemy.setTexture(flyingEnemiesTextures[textureID++]);
+        flyingEnemy.setCurrentAnimation(batAnim);
+        flyingEnemy.setTexture(flyingEnemiesTexture);
         flyingEnemy.setSize(flyingEnemySize);
         flyingEnemies.push_back(flyingEnemy);
         availableFlyingEnemies.push_back(&flyingEnemies[n]);
@@ -205,27 +205,23 @@ bool Enemies::checkOvercome()
     return false;
 }
 
-void Enemies::loadFlyingEnemiesTextures(const std::vector<sf::String> &paths)
+void Enemies::loadFlyingEnemiesTexture(const sf::String &path)
 {
-    flyingEnemiesTextures.resize(paths.size());
-    for (auto n = 0; n < paths.size(); ++n)
-        flyingEnemiesTextures[n].loadFromFile(paths[n]);
+    flyingEnemiesTexture.loadFromFile(path);
 }
 
-void Enemies::loadGroundEnemiesTextures(const std::vector<sf::String> &paths)
+void Enemies::loadGroundEnemiesTexture(const sf::String &path)
 {
-    groundEnemiesTextures.resize(paths.size());
-    for (auto n = 0; n < paths.size(); ++n)
-        groundEnemiesTextures[n].loadFromFile(paths[n]);
+    groundEnemiesTexture.loadFromFile(path);
 }
 
-void Enemies::updateAnimations(float elapsedTime, float worldVelocity)
+void Enemies::updateAnimations(float elapsedTime)
 {
     for (auto &Enemy : busyGroundEnemies)
-        Enemy->updateAnimation(elapsedTime, worldVelocity);
+        Enemy->updateAnimation(elapsedTime);
 
     for (auto &Enemy : busyFlyingEnemies)
-        Enemy->updateAnimation(elapsedTime, worldVelocity);
+        Enemy->updateAnimation(elapsedTime);
 }
 
 void Enemies::setSpawnTimer(float value)
