@@ -5,7 +5,13 @@
 
 InfoText::InfoText(sf::RenderWindow *windowH) : windowHandler(windowH)
 {
+    title.setCharacterSize(windowH->getSize().y * 0.1f);
+    content.setCharacterSize(windowH->getSize().y * 0.1f);
     update();
+    title.setFillColor(sf::Color::Red);
+    content.setFillColor(sf::Color::Red);
+    content.setOutlineColor(sf::Color::Cyan);
+    content.setOutlineThickness(1.f);
 }
 
 void InfoText::update()
@@ -18,8 +24,6 @@ void InfoText::update()
     background.setOutlineThickness(5.f);
     background.setFillColor(sf::Color::Black);
     background.setOrigin(background.getSize().x / 2, background.getSize().y / 2);
-    title.setCharacterSize(background.getSize().y * 0.35);
-    content.setCharacterSize(background.getSize().y * 0.2);
 }
 
 void InfoText::draw()
@@ -36,7 +40,7 @@ void InfoText::setPosition(float x, float y)
 {
     background.setPosition(x, y);
     title.setPosition(x, y - background.getSize().y * 0.4f);
-    content.setPosition(x, title.getPosition().y + 1.5f * title.getCharacterSize());
+    content.setPosition(x, title.getPosition().y + 3.f * title.getCharacterSize());
 }
 
 void InfoText::setPosition(const sf::Vector2f &pos)
@@ -47,13 +51,43 @@ void InfoText::setPosition(const sf::Vector2f &pos)
 void InfoText::setTitleText(const sf::String &text)
 {
     title.setString(text);
-    title.setOrigin(title.getLocalBounds().width / 2, title.getLocalBounds().height / 2);
+    auto titleLocal = title.getLocalBounds();
+    title.setOrigin(titleLocal.width / 2, titleLocal.height / 2);
+
+    // Венец гениальности и глупости:
+    // Вычисляем необходимый размер шрифта чтобы влезть в рамки
+    // Дорого.
+    auto titleGlobal = title.getGlobalBounds();
+    auto backgroundGlobal = background.getGlobalBounds();
+    while (titleGlobal.left < backgroundGlobal.left * 0.9f or
+           (titleGlobal.left + titleGlobal.width > backgroundGlobal.left * 0.9f + backgroundGlobal.width * 0.9f))
+    {
+        title.setCharacterSize(title.getCharacterSize() * 0.9f);
+        title.setOrigin(titleLocal.width / 2, titleLocal.height / 2);
+        titleGlobal = title.getGlobalBounds();
+        backgroundGlobal = background.getGlobalBounds();
+    }
 }
 
 void InfoText::setContentText(const sf::String &text)
 {
     content.setString(text);
-    content.setOrigin(content.getLocalBounds().width / 2, content.getLocalBounds().height / 2);
+    auto contentLocal = content.getLocalBounds();
+    content.setOrigin(contentLocal.width / 2, contentLocal.height / 2);
+
+    // Венец гениальности и глупости:
+    // Вычисляем необходимый размер шрифта чтобы влезть в рамки
+    // Дорого.
+    auto contentGlobal = content.getGlobalBounds();
+    auto backgroundGlobal = background.getGlobalBounds();
+    while (contentGlobal.left < backgroundGlobal.left * 0.9f or
+           (contentGlobal.left + contentGlobal.width > backgroundGlobal.left * 0.9f + backgroundGlobal.width * 0.9f))
+    {
+        content.setCharacterSize(content.getCharacterSize() * 0.9f);
+        content.setOrigin(contentLocal.width / 2, contentLocal.height / 2);
+        contentGlobal = content.getGlobalBounds();
+        backgroundGlobal = background.getGlobalBounds();
+    }
 }
 
 void InfoText::setGeneralFont(const sf::Font &font)

@@ -9,6 +9,8 @@ Enemies::Enemies(sf::RenderWindow *windowH, Player *playerH) : windowHandler(win
                                                                wormAnim({0, 0}, 2, 0.5f),
                                                                batAnim({0, 0}, 2, 0.5f)
 {
+    batTexture.loadFromFile("../Textures/bat.png");   // текстуры летучей мыши
+    wormTexture.loadFromFile("../Textures/worm.png"); // текстуры червяка
 }
 
 void Enemies::init()
@@ -16,76 +18,76 @@ void Enemies::init()
     auto windowSize = windowHandler->getSize();
     auto playerSize = playerHandler->model.getSize();
 
-    groundEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
-    distBetweenGroundEnemies = playerSize.x + groundEnemySize.x;
-    groundEnemiesAmount = windowSize.x / distBetweenGroundEnemies + 2;
+    wormSize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
+    distBetweenWorms = playerSize.x + wormSize.x;
+    wormsAmount = windowSize.x / distBetweenWorms + 2;
 
-    flyingEnemySize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
-    distBetweenFlyingEnemies = playerSize.x + flyingEnemySize.x;
-    flyingEnemiesAmount = windowSize.x / distBetweenFlyingEnemies + 2;
+    batSize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
+    distBetweenBats = playerSize.x + batSize.x;
+    batsAmount = windowSize.x / distBetweenBats + 2;
 
-    uncheckedGroundEnemies.clear();
-    busyGroundEnemies.clear();
-    groundEnemies.clear();
+    uncheckedWorms.clear();
+    busyWorms.clear();
+    worms.clear();
 
-    groundEnemies.reserve(groundEnemiesAmount);
+    worms.reserve(wormsAmount);
     unsigned textureID = 0;
-    for (auto n = 0; n < groundEnemiesAmount; ++n)
+    for (auto n = 0; n < wormsAmount; ++n)
     {
-        AnimatedModel groundEnemy(windowHandler);
-        groundEnemy.setCurrentAnimation(wormAnim);
-        groundEnemy.setTexture(groundEnemiesTexture);
-        groundEnemy.setSize(groundEnemySize);
-        groundEnemies.push_back(std::move(groundEnemy));
-        availableGroundEnemies.push_back(&groundEnemies[n]);
+        AnimatedModel worm(windowHandler);
+        worm.setCurrentAnimation(wormAnim);
+        worm.setTexture(wormTexture);
+        worm.setSize(batSize);
+        worms.push_back(std::move(worm));
+        availableWorms.push_back(&worms[n]);
     }
 
-    uncheckedFlyingEnemies.clear();
-    busyFlyingEnemies.clear();
-    flyingEnemies.clear();
-    flyingEnemies.reserve(flyingEnemiesAmount);
+    uncheckedBats.clear();
+    busyBats.clear();
+    bats.clear();
+    bats.reserve(batsAmount);
     textureID = 0;
-    for (auto n = 0; n < flyingEnemiesAmount; ++n)
+    for (auto n = 0; n < batsAmount; ++n)
     {
-        AnimatedModel flyingEnemy(windowHandler);
-        flyingEnemy.setCurrentAnimation(batAnim);
-        flyingEnemy.setTexture(flyingEnemiesTexture);
-        flyingEnemy.setSize(flyingEnemySize);
-        flyingEnemies.push_back(flyingEnemy);
-        availableFlyingEnemies.push_back(&flyingEnemies[n]);
+        AnimatedModel bat(windowHandler);
+        bat.setCurrentAnimation(batAnim);
+        bat.setTexture(batTexture);
+        bat.setSize(batSize);
+        bats.push_back(bat);
+        availableBats.push_back(&bats[n]);
     }
 }
 
 void Enemies::draw()
 {
-    for (auto &groundEnemy : busyGroundEnemies)
+    for (auto &groundEnemy : busyWorms)
         groundEnemy->draw();
 
-    for (auto &flyingEnemy : busyFlyingEnemies)
+    for (auto &flyingEnemy : busyBats)
         flyingEnemy->draw();
 }
 
 void Enemies::move(float x, float y)
 {
-    for (auto it = busyGroundEnemies.begin(); it < busyGroundEnemies.end(); ++it)
+    for (auto it = busyWorms.begin(); it < busyWorms.end(); ++it)
     {
         auto groundEnemyP = *it;
         if (groundEnemyP->sprite.getPosition().x + groundEnemyP->getSize().x / 2 <= 0)
         {
-            availableGroundEnemies.push_back(groundEnemyP);
-            it = busyGroundEnemies.erase(it);
+            availableWorms.push_back(groundEnemyP);
+            it = busyWorms.erase(it);
         }
         else
             groundEnemyP->sprite.move(x, y);
     }
 
-    for (auto it = busyFlyingEnemies.begin(); it < busyFlyingEnemies.end(); ++it)
+    for (auto it = busyBats.begin(); it < busyBats.end(); ++it)
     {
         auto flyingEnemyP = *it;
         if (flyingEnemyP->sprite.getPosition().x + flyingEnemyP->getSize().x / 2 <= 0)
         {
-            availableFlyingEnemies.push_back(flyingEnemyP);
-            it = busyFlyingEnemies.erase(it);
+            availableBats.push_back(flyingEnemyP);
+            it = busyBats.erase(it);
         }
         else
             flyingEnemyP->sprite.move(x, y);
@@ -100,7 +102,6 @@ void Enemies::move(const sf::Vector2f &offset)
 bool Enemies::spawn(float elapsedTime)
 {
     auto windowSize = windowHandler->getSize();
-    auto playerSize = playerHandler->model.getSize();
 
     spawnTimer += elapsedTime;
     if (spawnTimer < spawnInterval)
@@ -109,31 +110,32 @@ bool Enemies::spawn(float elapsedTime)
     spawnTimer -= spawnInterval;
     if (random.getInt(0, 1))
     {
-        auto &groundEnemy = *availableGroundEnemies.front();
-        busyGroundEnemies.push_back(availableGroundEnemies.front());
-        uncheckedGroundEnemies.push_back(availableGroundEnemies.front());
+        auto &groundEnemy = *availableWorms.front();
+        busyWorms.push_back(availableWorms.front());
+        uncheckedWorms.push_back(availableWorms.front());
         groundEnemy.sprite.setPosition(windowSize.x + groundEnemy.getSize().x / 2.f, groundHeight - groundEnemy.getSize().y / 2.0f);
-        availableGroundEnemies.pop_front();
+        availableWorms.pop_front();
     }
     else
     {
-        auto &flyingEnemy = *availableFlyingEnemies.front();
-        busyFlyingEnemies.push_back(availableFlyingEnemies.front());
-        uncheckedFlyingEnemies.push_back(availableFlyingEnemies.front());
+        auto playerSize = playerHandler->getRunningSize();
+        auto &flyingEnemy = *availableBats.front();
+        busyBats.push_back(availableBats.front());
+        uncheckedBats.push_back(availableBats.front());
         flyingEnemy.sprite.setPosition(windowSize.x + flyingEnemy.getSize().x / 2.f, groundHeight - playerSize.y / 2.f - flyingEnemy.getSize().y / 2.f);
-        availableFlyingEnemies.pop_front();
+        availableBats.pop_front();
     }
     return true;
 }
 
-float Enemies::getGroundDistance() const
+float Enemies::getWormDistance() const
 {
-    return distBetweenGroundEnemies;
+    return distBetweenWorms;
 }
 
-float Enemies::getFlyingDistance() const
+float Enemies::getBatDistance() const
 {
-    return distBetweenFlyingEnemies;
+    return distBetweenBats;
 }
 
 void Enemies::setGroundHeight(float newground)
@@ -159,19 +161,39 @@ sf::RenderWindow *Enemies::getWindowHandler()
 
 bool Enemies::checkCrash() const
 {
-    auto pR = playerHandler->model.sprite.getGlobalBounds();
+    auto playerHitBox = playerHandler->model.sprite.getGlobalBounds();
+    float yScale = playerHitBox.height * 0.1f;
+    float xScale = playerHitBox.width * 0.1f;
+    playerHitBox.left += xScale;
+    playerHitBox.width -= xScale * 2;
+    playerHitBox.top += yScale;
+    playerHitBox.height -= yScale * 2;
 
-    for (const auto &flying : busyFlyingEnemies)
+    for (const auto &bat : busyBats)
     {
-        auto eR = flying->sprite.getGlobalBounds();
-        if (pR.intersects(eR))
+        auto batHitBox = bat->sprite.getGlobalBounds();
+        yScale = batHitBox.height * 0.1f;
+        xScale = batHitBox.width * 0.1f;
+        batHitBox.left += xScale;
+        batHitBox.width -= xScale * 2;
+        batHitBox.top += yScale;
+        batHitBox.height -= yScale * 2;
+
+        if (playerHitBox.intersects(batHitBox))
             return true;
     }
 
-    for (const auto &ground : busyGroundEnemies)
+    for (const auto &worm : busyWorms)
     {
-        auto eR = ground->sprite.getGlobalBounds();
-        if (pR.intersects(eR))
+        auto wormHitBox = worm->sprite.getGlobalBounds();
+        yScale = wormHitBox.height * 0.1f;
+        xScale = wormHitBox.width * 0.1f;
+        wormHitBox.left += xScale;
+        wormHitBox.width -= xScale * 2;
+        wormHitBox.top += yScale;
+        wormHitBox.height -= yScale * 2;
+
+        if (playerHitBox.intersects(wormHitBox))
             return true;
     }
     return false;
@@ -180,24 +202,24 @@ bool Enemies::checkCrash() const
 bool Enemies::checkOvercome()
 {
     auto playerborder = playerHandler->model.sprite.getPosition().x - playerHandler->model.getSize().x / 2;
-    if (!uncheckedFlyingEnemies.empty())
+    if (!uncheckedBats.empty())
     {
-        auto flying = uncheckedFlyingEnemies.front();
+        auto flying = uncheckedBats.front();
         auto enemyborder = flying->sprite.getPosition().x + flying->getSize().x / 2;
         if (enemyborder < playerborder)
         {
-            uncheckedFlyingEnemies.pop_front();
+            uncheckedBats.pop_front();
             return true;
         }
     }
 
-    if (!uncheckedGroundEnemies.empty())
+    if (!uncheckedWorms.empty())
     {
-        auto ground = uncheckedGroundEnemies.front();
+        auto ground = uncheckedWorms.front();
         auto enemyborder = ground->sprite.getPosition().x + ground->getSize().x / 2;
         if (enemyborder < playerborder)
         {
-            uncheckedGroundEnemies.pop_front();
+            uncheckedWorms.pop_front();
             return true;
         }
     }
@@ -205,22 +227,22 @@ bool Enemies::checkOvercome()
     return false;
 }
 
-void Enemies::loadFlyingEnemiesTexture(const sf::String &path)
+void Enemies::loadBatTexture(const sf::String &path)
 {
-    flyingEnemiesTexture.loadFromFile(path);
+    batTexture.loadFromFile(path);
 }
 
-void Enemies::loadGroundEnemiesTexture(const sf::String &path)
+void Enemies::loadWormTexture(const sf::String &path)
 {
-    groundEnemiesTexture.loadFromFile(path);
+    wormTexture.loadFromFile(path);
 }
 
 void Enemies::updateAnimations(float elapsedTime)
 {
-    for (auto &Enemy : busyGroundEnemies)
+    for (auto &Enemy : busyWorms)
         Enemy->updateAnimation(elapsedTime);
 
-    for (auto &Enemy : busyFlyingEnemies)
+    for (auto &Enemy : busyBats)
         Enemy->updateAnimation(elapsedTime);
 }
 

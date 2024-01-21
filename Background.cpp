@@ -5,20 +5,46 @@
 
 #include <iostream>
 
-Background::Background(sf::RenderWindow *windowH) : windowHandler(windowH) {}
+Background::Background(sf::RenderWindow *windowH) : windowHandler(windowH)
+{
+    auto size = windowHandler->getSize(); // размер окна
+
+    setCloudsAmount(3);                                        // кол-во облаков
+    setCloudSize(sf::Vector2f(size.x * 0.3f, size.y * 0.2f));  // размер облаков
+    setTreesAmount(5);                                         // кол-во деревьев
+    setTreeSize(sf::Vector2f(size.x * 0.18f, size.y * 0.55f)); // размер деревьев
+
+    cloudTexture.loadFromFile("../Textures/cloud.png"); // Текстура облака
+    treeTexture.loadFromFile("../Textures/tree.png");   // Текстура дерева
+}
 
 void Background::init()
 {
     auto windowSize = windowHandler->getSize();
+    auto roadHalfSize = road.getSize() / 2.f;
     road.setSize(sf::Vector2f(windowSize.x, windowSize.y * 0.05f));
-    road.setOrigin(road.getSize().x / 2, road.getSize().y / 2);
+    road.setOrigin(roadHalfSize);
     road.setPosition(windowSize.x / 2, windowSize.y * 0.9f);
+
+    trees.clear();
+    trees.reserve(treesAmount + 1);
+    distBetweenTrees.x = static_cast<float>(windowSize.x) / treesAmount;
+    nextTreePosition = sf::Vector2f(treeSize.x / 2, road.getPosition().y - roadHalfSize.y - treeSize.y / 2);
+    for (auto n = 0; n < treesAmount + 1; ++n)
+    {
+        Model tree(windowHandler);
+        tree.setTexture(treeTexture);
+        tree.setSize(treeSize);
+        tree.sprite.setPosition(nextTreePosition);
+        nextTreePosition += distBetweenTrees;
+        trees.push_back(std::move(tree));
+    }
 
     clouds.clear();
     clouds.reserve(cloudsAmount + 1);
     distBetweenClouds.x = static_cast<float>(windowSize.x) / cloudsAmount;
     distBetweenClouds.y = windowSize.y * 0.1f;
-    nextCloudPosition = sf::Vector2f(cloudSize.x / 2, windowSize.y * 0.2f);
+    nextCloudPosition = sf::Vector2f(cloudSize.x / 2, trees[0].sprite.getPosition().y - trees[0].getSize().y / 2 - cloudSize.y / 2 - distBetweenClouds.y * 1.5f);
     for (auto n = 0; n < cloudsAmount + 1; ++n)
     {
         Model cloud(windowHandler);
@@ -28,20 +54,6 @@ void Background::init()
         nextCloudPosition += distBetweenClouds;
         distBetweenClouds.y *= -1;
         clouds.push_back(std::move(cloud));
-    }
-
-    trees.clear();
-    trees.reserve(treesAmount + 1);
-    distBetweenTrees.x = static_cast<float>(windowSize.x) / treesAmount;
-    nextTreePosition = sf::Vector2f(treeSize.x / 2, road.getPosition().y - road.getSize().y / 2 - treeSize.y / 2);
-    for (auto n = 0; n < treesAmount + 1; ++n)
-    {
-        Model tree(windowHandler);
-        tree.setTexture(treeTexture);
-        tree.setSize(treeSize);
-        tree.sprite.setPosition(nextTreePosition);
-        nextTreePosition += distBetweenTrees;
-        trees.push_back(std::move(tree));
     }
 }
 

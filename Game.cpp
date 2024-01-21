@@ -17,46 +17,22 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
 {
     const auto &size = window.getSize();
 
-    // Расположение
-    scoreboard.setPosition(0, size.y);
-    pausedText.setPosition(window.getSize().x / 2, window.getSize().y * 0.4f);
-    gameOverText.setPosition(window.getSize().x / 2, window.getSize().y * 0.4f);
-
-    // Внешний вид
-    background.loadCloudTexture("../Textures/cloud.png");     // Текстура облака
-    background.loadTreeTexture("../Textures/tree.png");       // Текстура дерева
-    enemies.loadFlyingEnemiesTexture("../Textures/bat.png");  // текстуры летучей мыши
-    enemies.loadGroundEnemiesTexture("../Textures/worm.png"); // текстуры червяка
-    player.loadTexture("../Textures/player.png");             // текстура игрока
-
-    background.setCloudsAmount(3);                                         // кол-во облаков
-    background.setCloudSize(sf::Vector2f(size.x * 0.12f, size.y * 0.08f)); // размер облаков
-    background.setTreesAmount(11);                                         // кол-во деревьев
-    background.setTreeSize(sf::Vector2f(size.x * 0.06f, size.y * 0.3f));   // размер деревьев
-
-    font.loadFromFile("../LOST_LATE.ttf");
+    font.loadFromFile("../fonts/HERO.ttf");
 
     scoreboard.setFont(font);
-    scoreboard.setFillColor(sf::Color::Red);
 
     pausedText.setGeneralFont(font);
-    pausedText.setTitleText("Game is Paused!");
-    pausedText.setContentText("ESC - pause/continue\n"
-                              "arrow up/W - jump\n"
-                              "arrow down/S - slide");
-    pausedText.title.setFillColor(sf::Color::Red);
-    pausedText.content.setFillColor(sf::Color::Red);
-    // pausedText.content.setOutlineColor(sf::Color::Cyan);
-    // pausedText.content.setOutlineThickness(1.f);
+    pausedText.setTitleText(L"Игра приостановлена!!");
+    pausedText.setContentText(L"ESC - пауза/продолжить\n"
+                              L"стрелочка вверх/W - прыжок\n"
+                              L"стрелочка вниз/S - скольжение");
+    pausedText.setPosition(size.x / 2, size.y * 0.4f);
 
     gameOverText.setGeneralFont(font);
-    gameOverText.setTitleText("Game over!");
-    gameOverText.setContentText("Press ESC to continue");
-    gameOverText.title.setFillColor(sf::Color::Red);
-    gameOverText.content.setFillColor(sf::Color::Red);
+    gameOverText.setTitleText(L"Конец игры!");
+    gameOverText.setContentText(L"Нажми ESC чтобы продолжить");
+    gameOverText.setPosition(size.x / 2, size.y * 0.4f);
 
-    // Геймплейное
-    player.jumpHeight = size.y * 0.5f;
     isPaused = true;
     pausedText.isActive = true;
 
@@ -81,11 +57,11 @@ void Game::restart()
 
     player.model.sprite.setPosition(size.x * 0.15f + player.model.getSize().x / 2,
                                     background.getGround() - player.model.getSize().y / 2);
-    player.jumpVelocity = size.y * 0.001f;
+    player.jumpVelocity = size.y * 0.1f;
     player.maxJumpVelocity = player.jumpVelocity * 10;
     player.jumpVelocityStep = (player.maxJumpVelocity - player.jumpVelocity) / 100;
 
-    enemies.setMinSpawnInterval(std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity);
+    enemies.setMinSpawnInterval(std::max(enemies.getBatDistance(), enemies.getWormDistance()) / worldVelocity);
     scoreboard.setScore(0);
 }
 
@@ -128,8 +104,8 @@ void Game::update()
                 if (isGameOver)
                 {
                     restart();
-                    isGameOver = !isGameOver;
-                    gameOverText.isActive = !gameOverText.isActive;
+                    isGameOver = false;
+                    gameOverText.isActive = false;
                     break;
                 }
                 isPaused = !isPaused;
@@ -161,7 +137,7 @@ void Game::update()
     if (enemies.checkCrash())
     {
         // isGameOver = true;
-        // gameOverText.toShow = true;
+        // gameOverText.isActive = true;
         // return;
     }
 
@@ -170,7 +146,7 @@ void Game::update()
 
     if (enemies.spawn(elapsedTime))
     {
-        enemies.setMinSpawnInterval(std::max(enemies.getFlyingDistance(), enemies.getGroundDistance()) / worldVelocity);
+        enemies.setMinSpawnInterval(std::max(enemies.getBatDistance(), enemies.getWormDistance()) / worldVelocity);
         if (worldVelocity < maxWorldVelocity)
         {
             worldVelocity += worldVelocityStep;

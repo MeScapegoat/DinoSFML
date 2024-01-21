@@ -39,9 +39,9 @@ void AnimatedModel::setSize(float x, float y)
     sprite.setScale(normalScale);
 }
 
-void AnimatedModel::setSize(const sf::Vector2f &size)
+void AnimatedModel::setSize(const sf::Vector2f &s)
 {
-    setSize(size.x, size.y);
+    setSize(s.x, s.y);
 }
 
 void AnimatedModel::setTexture(const sf::Texture &texture)

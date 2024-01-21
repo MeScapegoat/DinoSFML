@@ -5,6 +5,6 @@
 
 int main()
 {
-    Game game(sf::VideoMode(1500, 1000), sf::String("Game"));
+    Game game(sf::VideoMode(1200, 800), sf::String("Game"));
     game.run();
 }

@@ -5,6 +5,8 @@
 
 Scoreboard::Scoreboard(sf::RenderWindow *windowH) : windowHandler(windowH)
 {
+    setPosition(0, windowHandler->getSize().y);
+    setFillColor(sf::Color::Red);
     setScore(0);
 }
 
