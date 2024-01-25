@@ -110,6 +110,8 @@ bool Enemies::spawn(float elapsedTime)
     spawnTimer -= spawnInterval;
     if (random.getInt(0, 1))
     {
+        if (availableWorms.empty())
+            return false;
         auto &groundEnemy = *availableWorms.front();
         busyWorms.push_back(availableWorms.front());
         uncheckedWorms.push_back(availableWorms.front());
@@ -118,6 +120,8 @@ bool Enemies::spawn(float elapsedTime)
     }
     else
     {
+        if (availableBats.empty())
+            return false;
         auto playerSize = playerHandler->getRunningSize();
         auto &flyingEnemy = *availableBats.front();
         busyBats.push_back(availableBats.front());
@@ -162,38 +166,41 @@ sf::RenderWindow *Enemies::getWindowHandler()
 bool Enemies::checkCrash() const
 {
     auto playerHitBox = playerHandler->model.sprite.getGlobalBounds();
-    float yScale = playerHitBox.height * 0.1f;
-    float xScale = playerHitBox.width * 0.1f;
-    playerHitBox.left += xScale;
-    playerHitBox.width -= xScale * 2;
-    playerHitBox.top += yScale;
-    playerHitBox.height -= yScale * 2;
+    sf::FloatRect intersection;
+    // float yScale = playerHitBox.height * 0.1f;
+    // float xScale = playerHitBox.width * 0.1f;
+    // playerHitBox.left += xScale;
+    // playerHitBox.width -= xScale * 2;
+    // playerHitBox.top += yScale;
+    // playerHitBox.height -= yScale * 2;
 
     for (const auto &bat : busyBats)
     {
         auto batHitBox = bat->sprite.getGlobalBounds();
-        yScale = batHitBox.height * 0.1f;
-        xScale = batHitBox.width * 0.1f;
-        batHitBox.left += xScale;
-        batHitBox.width -= xScale * 2;
-        batHitBox.top += yScale;
-        batHitBox.height -= yScale * 2;
+        // yScale = batHitBox.height * 0.1f;
+        // xScale = batHitBox.width * 0.1f;
+        // batHitBox.left += xScale;
+        // batHitBox.width -= xScale * 2;
+        // batHitBox.top += yScale;
+        // batHitBox.height -= yScale * 2;
 
-        if (playerHitBox.intersects(batHitBox))
+        playerHitBox.intersects(batHitBox, intersection);
+        if (intersection.width > playerHitBox.width * 0.1f or intersection.height > playerHitBox.height * 0.1f)
             return true;
     }
 
     for (const auto &worm : busyWorms)
     {
         auto wormHitBox = worm->sprite.getGlobalBounds();
-        yScale = wormHitBox.height * 0.1f;
-        xScale = wormHitBox.width * 0.1f;
-        wormHitBox.left += xScale;
-        wormHitBox.width -= xScale * 2;
-        wormHitBox.top += yScale;
-        wormHitBox.height -= yScale * 2;
+        // yScale = wormHitBox.height * 0.1f;
+        // xScale = wormHitBox.width * 0.1f;
+        // wormHitBox.left += xScale;
+        // wormHitBox.width -= xScale * 2;
+        // wormHitBox.top += yScale;
+        // wormHitBox.height -= yScale * 2;
 
-        if (playerHitBox.intersects(wormHitBox))
+        playerHitBox.intersects(wormHitBox, intersection);
+        if (intersection.width > playerHitBox.width * 0.1f or intersection.height > playerHitBox.height * 0.1f)
             return true;
     }
     return false;

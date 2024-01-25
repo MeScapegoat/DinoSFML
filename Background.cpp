@@ -21,8 +21,8 @@ Background::Background(sf::RenderWindow *windowH) : windowHandler(windowH)
 void Background::init()
 {
     auto windowSize = windowHandler->getSize();
-    auto roadHalfSize = road.getSize() / 2.f;
     road.setSize(sf::Vector2f(windowSize.x, windowSize.y * 0.05f));
+    auto roadHalfSize = road.getSize() / 2.f;
     road.setOrigin(roadHalfSize);
     road.setPosition(windowSize.x / 2, windowSize.y * 0.9f);
 

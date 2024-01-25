@@ -63,6 +63,7 @@ void InfoText::setTitleText(const sf::String &text)
            (titleGlobal.left + titleGlobal.width > backgroundGlobal.left * 0.9f + backgroundGlobal.width * 0.9f))
     {
         title.setCharacterSize(title.getCharacterSize() * 0.9f);
+        titleLocal = title.getLocalBounds();
         title.setOrigin(titleLocal.width / 2, titleLocal.height / 2);
         titleGlobal = title.getGlobalBounds();
         backgroundGlobal = background.getGlobalBounds();
@@ -84,6 +85,7 @@ void InfoText::setContentText(const sf::String &text)
            (contentGlobal.left + contentGlobal.width > backgroundGlobal.left * 0.9f + backgroundGlobal.width * 0.9f))
     {
         content.setCharacterSize(content.getCharacterSize() * 0.9f);
+        contentLocal = content.getLocalBounds();
         content.setOrigin(contentLocal.width / 2, contentLocal.height / 2);
         contentGlobal = content.getGlobalBounds();
         backgroundGlobal = background.getGlobalBounds();

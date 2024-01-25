@@ -6,6 +6,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Audio/Music.hpp>
 
 // мое добро
 #include "Background.hpp"
@@ -17,7 +18,7 @@
 class Game
 {
 public:
-    Game(sf::VideoMode mode, const sf::String &title, uint32_t style = sf::Style::Default);
+    Game(sf::VideoMode mode, const sf::String &title, uint32_t style = sf::Style::Fullscreen);
     ~Game() = default;
 
 public:
@@ -35,25 +36,26 @@ public:
 private:
     sf::RenderWindow window;
 
-    InfoText gameOverText;
-    InfoText pausedText;
-    Scoreboard scoreboard;
+    InfoText gameOverText; // Уведомление о конце игры
+    InfoText pausedText;   // Уведомление о паузе
+    Scoreboard scoreboard; // счетчик очков
 
-    Background background;
-    Enemies enemies;
-    Player player;
+    Background background; // фон: деревья, облака, дорога
+    Enemies enemies;       // враги
+    Player player;         // игрок
 
     sf::Font font;
 
-    float elapsedTime;
+    float elapsedTime; // время прошедшее с последней итерации игры
 
-    float worldVelocity;
-    float worldVelocityStep;
-    float maxWorldVelocity;
+    float worldVelocity;     // Скорость мира (окружения)
+    float worldAcceleration; // Ускорение мира
+    float maxWorldVelocity;  // максимальная скорость мира
 
     bool isPaused;
     bool isGameOver;
 
-    sf::Event event{};
+    sf::Music soundtrack;
+    sf::Event event;
     sf::Clock clock;
 };

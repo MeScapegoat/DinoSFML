@@ -5,6 +5,8 @@
 
 #include "Game.hpp"
 
+#include <iostream>
+
 Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     : window(mode, title, style),
       gameOverText(&window),
@@ -25,16 +27,24 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     pausedText.setTitleText(L"Игра приостановлена!!");
     pausedText.setContentText(L"ESC - пауза/продолжить\n"
                               L"стрелочка вверх/W - прыжок\n"
-                              L"стрелочка вниз/S - скольжение");
+                              L"стрелочка вниз/S - скольжение\n"
+                              L"Z - выход из игры");
     pausedText.setPosition(size.x / 2, size.y * 0.4f);
 
     gameOverText.setGeneralFont(font);
     gameOverText.setTitleText(L"Конец игры!");
-    gameOverText.setContentText(L"Нажми ESC чтобы продолжить");
+    gameOverText.setContentText(L"Нажми ESC чтобы продолжить\n"
+                                L"Нажми Z чтобы выйти");
     gameOverText.setPosition(size.x / 2, size.y * 0.4f);
 
     isPaused = true;
     pausedText.isActive = true;
+
+    soundtrack.openFromFile("../Sound/Toys - Hunter Milo.ogg"); // Говорят что это Copyright free
+    soundtrack.setLoopPoints({sf::seconds(4.7f), sf::seconds(33.6f)});
+    soundtrack.setPlayingOffset(soundtrack.getLoopPoints().offset);
+    soundtrack.setLoop(true);
+    soundtrack.setVolume(20);
 
     restart();
 }
@@ -52,14 +62,14 @@ void Game::restart()
     enemies.init();
     worldVelocity = 200;
     maxWorldVelocity = worldVelocity * 5;
-    worldVelocityStep = (maxWorldVelocity - worldVelocity) / 100;
+    worldAcceleration = (maxWorldVelocity - worldVelocity) / 100;
     elapsedTime = 0;
 
     player.model.sprite.setPosition(size.x * 0.15f + player.model.getSize().x / 2,
                                     background.getGround() - player.model.getSize().y / 2);
     player.jumpVelocity = size.y * 0.1f;
     player.maxJumpVelocity = player.jumpVelocity * 10;
-    player.jumpVelocityStep = (player.maxJumpVelocity - player.jumpVelocity) / 100;
+    player.jumpAcceleration = (player.maxJumpVelocity - player.jumpVelocity) / 100;
 
     enemies.setMinSpawnInterval(std::max(enemies.getBatDistance(), enemies.getWormDistance()) / worldVelocity);
     scoreboard.setScore(0);
@@ -115,7 +125,9 @@ void Game::update()
             case sf::Keyboard::Up:
                 player.jump();
                 break;
-
+            case sf::Keyboard::Z:
+                if (isGameOver or isPaused)
+                    window.close();
             default:
                 break;
             } // switch event.key.code
@@ -126,7 +138,12 @@ void Game::update()
     }
 
     if (isPaused or isGameOver)
+    {
+        soundtrack.pause();
         return;
+    }
+    if (soundtrack.getStatus() != sf::Music::Status::Playing)
+        soundtrack.play();
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) or sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         player.setSliding(true);
@@ -149,8 +166,8 @@ void Game::update()
         enemies.setMinSpawnInterval(std::max(enemies.getBatDistance(), enemies.getWormDistance()) / worldVelocity);
         if (worldVelocity < maxWorldVelocity)
         {
-            worldVelocity += worldVelocityStep;
-            player.jumpVelocity += player.jumpVelocityStep;
+            worldVelocity += worldAcceleration;
+            player.jumpVelocity += player.jumpAcceleration;
         }
     }
     enemies.updateAnimations(elapsedTime);

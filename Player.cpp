@@ -10,7 +10,9 @@ Player::Player(sf::RenderWindow *windowH) : model(windowH),
                                             isSliding(false),
                                             jumpHeight(windowH->getSize().y * 0.5f),
                                             run({0, 0}, 2, .5f),
-                                            slide({0, TEXTURE_SIZE.y}, 1, 0)
+                                            slide({0, TEXTURE_SIZE.y}, 1, 0),
+                                            jumpSound(jumpSoundBuffer),
+                                            slideSound(slideSoundBuffer)
 {
     auto windowSize = windowH->getSize();
 
@@ -21,6 +23,9 @@ Player::Player(sf::RenderWindow *windowH) : model(windowH),
     model.setCurrentAnimation(run);
 
     loadTexture("../Textures/player.png"); // текстура игрока
+
+    jumpSoundBuffer.loadFromFile("../Sound/jump.wav");
+    slideSoundBuffer.loadFromFile("../Sound/slide.wav");
 }
 
 void Player::move(float elapsedTime)
@@ -42,7 +47,11 @@ void Player::move(float elapsedTime)
 void Player::jump()
 {
     if (!jumpState)
+    {
         jumpState = -1;
+        slideSound.stop();
+        jumpSound.play();
+    }
 }
 
 void Player::loadTexture(const std::string &path)
@@ -61,6 +70,8 @@ void Player::setSliding(bool flag)
     isSliding = flag;
     if (isSliding)
     {
+        jumpSound.stop();
+        slideSound.play();
         model.setCurrentAnimation(slide);
         model.setSize(slidingSize);
 
@@ -68,6 +79,7 @@ void Player::setSliding(bool flag)
     }
     else
     {
+        slideSound.stop();
         model.setCurrentAnimation(run);
         model.setSize(runningSize);
 
