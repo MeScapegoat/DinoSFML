@@ -16,7 +16,7 @@ Player::Player(sf::RenderWindow *windowH) : model(windowH),
 {
     auto windowSize = windowH->getSize();
 
-    runningSize = {windowSize.x * 0.1f, windowSize.y * 0.3f};
+    runningSize = {windowSize.x * 0.08f, windowSize.y * 0.3f};
     slidingSize = {runningSize.y, runningSize.x};
 
     model.setSize(runningSize);
@@ -26,6 +26,7 @@ Player::Player(sf::RenderWindow *windowH) : model(windowH),
 
     jumpSoundBuffer.loadFromFile("../Sound/jump.wav");
     slideSoundBuffer.loadFromFile("../Sound/slide.wav");
+    slideSound.setPitch(3.f);
 }
 
 void Player::move(float elapsedTime)
@@ -46,7 +47,7 @@ void Player::move(float elapsedTime)
 
 void Player::jump()
 {
-    if (!jumpState)
+    if (!jumpState and !isSliding)
     {
         jumpState = -1;
         slideSound.stop();

@@ -5,25 +5,27 @@
 
 InfoText::InfoText(sf::RenderWindow *windowH) : windowHandler(windowH)
 {
-    title.setCharacterSize(windowH->getSize().y * 0.1f);
-    content.setCharacterSize(windowH->getSize().y * 0.1f);
     update();
-    title.setFillColor(sf::Color::Red);
-    content.setFillColor(sf::Color::Red);
-    content.setOutlineColor(sf::Color::Cyan);
-    content.setOutlineThickness(1.f);
 }
 
 void InfoText::update()
 {
     if (!windowHandler)
         return;
+
     auto windowSize = windowHandler->getSize();
     background.setSize(sf::Vector2f(windowSize.x * 0.5, windowSize.y * 0.5));
-    background.setOutlineColor(sf::Color::Red);
+    background.setOutlineColor(sf::Color(255, 230, 230));
     background.setOutlineThickness(5.f);
-    background.setFillColor(sf::Color::Black);
+    background.setFillColor(sf::Color(150, 120, 140, 196));
     background.setOrigin(background.getSize().x / 2, background.getSize().y / 2);
+
+    title.setCharacterSize(windowSize.y * 0.1f);
+    content.setCharacterSize(windowSize.y * 0.1f);
+    title.setFillColor(sf::Color(255, 230, 230));
+    content.setFillColor(sf::Color(255, 230, 230));
+    content.setOutlineColor(sf::Color(130, 255, 210));
+    content.setOutlineThickness(1.f);
 }
 
 void InfoText::draw()

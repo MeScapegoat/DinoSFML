@@ -10,26 +10,28 @@ Background::Background(sf::RenderWindow *windowH) : windowHandler(windowH)
     auto size = windowHandler->getSize(); // размер окна
 
     setCloudsAmount(3);                                        // кол-во облаков
-    setCloudSize(sf::Vector2f(size.x * 0.3f, size.y * 0.2f));  // размер облаков
+    setCloudSize(sf::Vector2f(size.x * 0.2f, size.y * 0.15f)); // размер облаков
     setTreesAmount(5);                                         // кол-во деревьев
     setTreeSize(sf::Vector2f(size.x * 0.18f, size.y * 0.55f)); // размер деревьев
 
     cloudTexture.loadFromFile("../Textures/cloud.png"); // Текстура облака
     treeTexture.loadFromFile("../Textures/tree.png");   // Текстура дерева
+
+    road.setSize(sf::Vector2f(size.x, size.y * 0.1f));
+    road.setFillColor(sf::Color(255, 218, 236));
+
+    road.setOrigin(road.getSize().x / 2, road.getSize().y);
+    road.setPosition(size.x / 2, size.y);
 }
 
 void Background::init()
 {
     auto windowSize = windowHandler->getSize();
-    road.setSize(sf::Vector2f(windowSize.x, windowSize.y * 0.05f));
-    auto roadHalfSize = road.getSize() / 2.f;
-    road.setOrigin(roadHalfSize);
-    road.setPosition(windowSize.x / 2, windowSize.y * 0.9f);
 
     trees.clear();
     trees.reserve(treesAmount + 1);
     distBetweenTrees.x = static_cast<float>(windowSize.x) / treesAmount;
-    nextTreePosition = sf::Vector2f(treeSize.x / 2, road.getPosition().y - roadHalfSize.y - treeSize.y / 2);
+    nextTreePosition = sf::Vector2f(treeSize.x / 2, getGround() - treeSize.y / 2);
     for (auto n = 0; n < treesAmount + 1; ++n)
     {
         Model tree(windowHandler);
@@ -59,6 +61,7 @@ void Background::init()
 
 void Background::draw()
 {
+    windowHandler->clear(sf::Color(120, 210, 255));
     if (!windowHandler)
         return;
     for (auto &cloud : clouds)
@@ -156,7 +159,7 @@ const sf::Vector2f &Background::getTreeSize() const
 
 float Background::getGround() const
 {
-    return road.getPosition().y - road.getSize().y / 2;
+    return road.getPosition().y - road.getSize().y;
 }
 
 void Background::loadCloudTexture(const sf::String &file)

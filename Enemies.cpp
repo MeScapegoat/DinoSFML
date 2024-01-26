@@ -18,11 +18,11 @@ void Enemies::init()
     auto windowSize = windowHandler->getSize();
     auto playerSize = playerHandler->model.getSize();
 
-    wormSize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
+    wormSize = sf::Vector2f(windowSize.x * 0.12f, windowSize.y * 0.12f);
     distBetweenWorms = playerSize.x + wormSize.x;
     wormsAmount = windowSize.x / distBetweenWorms + 2;
 
-    batSize = sf::Vector2f(windowSize.x * 0.2f, windowSize.y * 0.2f);
+    batSize = sf::Vector2f(windowSize.x * 0.13f, windowSize.y * 0.16f);
     distBetweenBats = playerSize.x + batSize.x;
     batsAmount = windowSize.x / distBetweenBats + 2;
 
@@ -37,7 +37,7 @@ void Enemies::init()
         AnimatedModel worm(windowHandler);
         worm.setCurrentAnimation(wormAnim);
         worm.setTexture(wormTexture);
-        worm.setSize(batSize);
+        worm.setSize(wormSize);
         worms.push_back(std::move(worm));
         availableWorms.push_back(&worms[n]);
     }

@@ -41,10 +41,16 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     pausedText.isActive = true;
 
     soundtrack.openFromFile("../Sound/Toys - Hunter Milo.ogg"); // Говорят что это Copyright free
-    soundtrack.setLoopPoints({sf::seconds(4.7f), sf::seconds(33.6f)});
+    soundtrack.setLoopPoints({sf::seconds(2.f), sf::seconds(10.0f)});
     soundtrack.setPlayingOffset(soundtrack.getLoopPoints().offset);
     soundtrack.setLoop(true);
-    soundtrack.setVolume(20);
+    soundtrack.setVolume(30);
+
+    enemies.setGroundHeight(background.getGround());
+    player.groundLevel = background.getGround();
+    scoreboard.setCharacterSize(size.y - background.getGround());
+    scoreboard.setOrigin(0, scoreboard.getCharacterSize());
+    scoreboard.setPosition(0, size.y * 0.99f);
 
     restart();
 }
@@ -53,12 +59,6 @@ void Game::restart()
 {
     const auto &size = window.getSize();
     background.init();
-
-    enemies.setGroundHeight(background.getGround());
-    player.groundLevel = background.getGround();
-    scoreboard.setCharacterSize(size.y - background.road.getPosition().y);
-    scoreboard.setOrigin(0, scoreboard.getCharacterSize());
-
     enemies.init();
     worldVelocity = 200;
     maxWorldVelocity = worldVelocity * 5;
@@ -79,8 +79,6 @@ void Game::render()
 {
     if (!window.isOpen())
         return;
-
-    window.clear(sf::Color::Black);
 
     background.draw();
     scoreboard.draw();
