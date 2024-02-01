@@ -16,7 +16,7 @@ public:
     Background &operator=(Background &&) = delete;
 
 public:
-    void init();
+    void restart();
 
     void draw();
 
@@ -42,15 +42,11 @@ public:
     void loadCloudTexture(const sf::String &);
     void loadTreeTexture(const sf::String &);
 
-    // не доработана - не использовать
-    void setWindowHandler(sf::RenderWindow *);
     sf::RenderWindow *getWindowHandler();
-
-public:
-    sf::RectangleShape road;
 
 private:
     sf::RenderWindow *windowHandler{nullptr};
+
     sf::Texture cloudTexture;
     int cloudsAmount;
     sf::Vector2f cloudSize;
@@ -64,4 +60,6 @@ private:
     sf::Vector2f distBetweenTrees;
     sf::Vector2f nextTreePosition;
     std::vector<Model> trees;
+
+    sf::RectangleShape road;
 };

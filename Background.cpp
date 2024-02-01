@@ -9,28 +9,29 @@ Background::Background(sf::RenderWindow *windowH) : windowHandler(windowH)
 {
     auto size = windowHandler->getSize(); // размер окна
 
-    setCloudsAmount(3);                                        // кол-во облаков
-    setCloudSize(sf::Vector2f(size.x * 0.2f, size.y * 0.15f)); // размер облаков
-    setTreesAmount(5);                                         // кол-во деревьев
-    setTreeSize(sf::Vector2f(size.x * 0.18f, size.y * 0.55f)); // размер деревьев
+    setCloudsAmount(3);                                              // кол-во облаков
+    setCloudSize(sf::Vector2f(size.x * 0.2f, size.y * 0.15f));       // размер облаков
+    distBetweenClouds.x = static_cast<float>(size.x) / cloudsAmount; // расстояние между облаками по х
+    distBetweenClouds.y = size.y * 0.1f;                             // расстояние между облаками по у
+    cloudTexture.loadFromFile("../Textures/cloud.png");              // Текстура облака
 
-    cloudTexture.loadFromFile("../Textures/cloud.png"); // Текстура облака
-    treeTexture.loadFromFile("../Textures/tree.png");   // Текстура дерева
+    setTreesAmount(5);                                             // кол-во деревьев
+    setTreeSize(sf::Vector2f(size.x * 0.18f, size.y * 0.55f));     // размер деревьев
+    distBetweenTrees.x = static_cast<float>(size.x) / treesAmount; // расстояние между деревьями
+    treeTexture.loadFromFile("../Textures/tree.png");              // Текстура дерева
 
-    road.setSize(sf::Vector2f(size.x, size.y * 0.1f));
-    road.setFillColor(sf::Color(255, 218, 236));
-
-    road.setOrigin(road.getSize().x / 2, road.getSize().y);
-    road.setPosition(size.x / 2, size.y);
+    road.setSize(sf::Vector2f(size.x, size.y * 0.1f));      // размер дороги
+    road.setFillColor(sf::Color(255, 218, 236));            // цвет дороги
+    road.setOrigin(road.getSize().x / 2, road.getSize().y); // центр дороги
+    road.setPosition(size.x / 2, size.y);                   // расположение дороги
 }
 
-void Background::init()
+void Background::restart()
 {
     auto windowSize = windowHandler->getSize();
 
     trees.clear();
     trees.reserve(treesAmount + 1);
-    distBetweenTrees.x = static_cast<float>(windowSize.x) / treesAmount;
     nextTreePosition = sf::Vector2f(treeSize.x / 2, getGround() - treeSize.y / 2);
     for (auto n = 0; n < treesAmount + 1; ++n)
     {
@@ -44,9 +45,8 @@ void Background::init()
 
     clouds.clear();
     clouds.reserve(cloudsAmount + 1);
-    distBetweenClouds.x = static_cast<float>(windowSize.x) / cloudsAmount;
-    distBetweenClouds.y = windowSize.y * 0.1f;
-    nextCloudPosition = sf::Vector2f(cloudSize.x / 2, trees[0].sprite.getPosition().y - trees[0].getSize().y / 2 - cloudSize.y / 2 - distBetweenClouds.y * 1.5f);
+    nextCloudPosition = sf::Vector2f(cloudSize.x / 2,
+                                     trees[0].sprite.getPosition().y - trees[0].getSize().y / 2 - cloudSize.y / 2 - distBetweenClouds.y * 1.5f);
     for (auto n = 0; n < cloudsAmount + 1; ++n)
     {
         Model cloud(windowHandler);
@@ -61,7 +61,7 @@ void Background::init()
 
 void Background::draw()
 {
-    windowHandler->clear(sf::Color(120, 210, 255));
+    windowHandler->clear(sf::Color(120, 210, 255)); // цвет фона
     if (!windowHandler)
         return;
     for (auto &cloud : clouds)
@@ -75,7 +75,11 @@ void Background::draw()
 
 void Background::move(float x, float y)
 {
-    sf::Vector2f offset(x, y);
+    move({x, y});
+}
+
+void Background::move(const sf::Vector2f &offset)
+{
     nextCloudPosition += offset;
     nextTreePosition += offset;
     for (auto &cloud : clouds)
@@ -100,11 +104,6 @@ void Background::move(float x, float y)
             nextTreePosition += distBetweenTrees;
         }
     }
-}
-
-void Background::move(const sf::Vector2f &offset)
-{
-    move(offset.x, offset.y);
 }
 
 void Background::setCloudsAmount(int amount)
@@ -170,12 +169,6 @@ void Background::loadCloudTexture(const sf::String &file)
 void Background::loadTreeTexture(const sf::String &file)
 {
     treeTexture.loadFromFile(file);
-}
-
-void Background::setWindowHandler(sf::RenderWindow *windowH)
-{
-    windowHandler = windowH;
-    // обработать все модели размеры и прочее в соответствии с новым окном
 }
 
 sf::RenderWindow *Background::getWindowHandler()

@@ -8,7 +8,6 @@
 Player::Player(sf::RenderWindow *windowH) : model(windowH),
                                             jumpState(0),
                                             isSliding(false),
-                                            jumpHeight(windowH->getSize().y * 0.5f),
                                             run({0, 0}, 2, .5f),
                                             slide({0, TEXTURE_SIZE.y}, 1, 0),
                                             jumpSound(jumpSoundBuffer),

@@ -41,7 +41,7 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     pausedText.isActive = true;
 
     soundtrack.openFromFile("../Sound/Toys - Hunter Milo.ogg"); // Говорят что это Copyright free
-    soundtrack.setLoopPoints({sf::seconds(2.f), sf::seconds(10.0f)});
+    soundtrack.setLoopPoints({sf::seconds(1.7f), sf::seconds(6.f)});
     soundtrack.setPlayingOffset(soundtrack.getLoopPoints().offset);
     soundtrack.setLoop(true);
     soundtrack.setVolume(30);
@@ -52,26 +52,33 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     scoreboard.setOrigin(0, scoreboard.getCharacterSize());
     scoreboard.setPosition(0, size.y * 0.99f);
 
+    maxWorldVelocity = worldVelocity * 5;
+    worldVelocity = 200;
+    worldAcceleration = (maxWorldVelocity - worldVelocity) / 100;
+
+    player.jumpVelocity = worldVelocity / 1.5f;
+    player.maxJumpVelocity = maxWorldVelocity / 1.5f;
+    player.jumpAcceleration = (player.maxJumpVelocity - player.jumpVelocity) / 100;
+
     restart();
+
+    player.jumpHeight = player.groundLevel - enemies.getWormSize().y * 2;
 }
 
 void Game::restart()
 {
-    const auto &size = window.getSize();
-    background.init();
-    enemies.init();
+    background.restart();
+    enemies.restart();
+
     worldVelocity = 200;
-    maxWorldVelocity = worldVelocity * 5;
-    worldAcceleration = (maxWorldVelocity - worldVelocity) / 100;
     elapsedTime = 0;
 
+    const auto &size = window.getSize();
     player.model.sprite.setPosition(size.x * 0.15f + player.model.getSize().x / 2,
                                     background.getGround() - player.model.getSize().y / 2);
-    player.jumpVelocity = size.y * 0.1f;
-    player.maxJumpVelocity = player.jumpVelocity * 10;
-    player.jumpAcceleration = (player.maxJumpVelocity - player.jumpVelocity) / 100;
+    player.jumpVelocity = worldVelocity / 1.5f;
 
-    enemies.setMinSpawnInterval(std::max(enemies.getBatDistance(), enemies.getWormDistance()) / worldVelocity);
+    enemies.setMinSpawnInterval(enemies.getBetweenDistance() / worldVelocity);
     scoreboard.setScore(0);
 }
 
@@ -82,6 +89,7 @@ void Game::render()
 
     background.draw();
     scoreboard.draw();
+
     enemies.draw();
     player.model.draw();
 
@@ -151,9 +159,9 @@ void Game::update()
 
     if (enemies.checkCrash())
     {
-        // isGameOver = true;
-        // gameOverText.isActive = true;
-        // return;
+        isGameOver = true;
+        gameOverText.isActive = true;
+        return;
     }
 
     if (enemies.checkOvercome())
@@ -161,7 +169,7 @@ void Game::update()
 
     if (enemies.spawn(elapsedTime))
     {
-        enemies.setMinSpawnInterval(std::max(enemies.getBatDistance(), enemies.getWormDistance()) / worldVelocity);
+        enemies.setMinSpawnInterval(enemies.getBetweenDistance() / worldVelocity);
         if (worldVelocity < maxWorldVelocity)
         {
             worldVelocity += worldAcceleration;

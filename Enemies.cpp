@@ -9,29 +9,29 @@ Enemies::Enemies(sf::RenderWindow *windowH, Player *playerH) : windowHandler(win
                                                                wormAnim({0, 0}, 2, 0.5f),
                                                                batAnim({0, 0}, 2, 0.5f)
 {
-    batTexture.loadFromFile("../Textures/bat.png");   // текстуры летучей мыши
-    wormTexture.loadFromFile("../Textures/worm.png"); // текстуры червяка
+
+    auto windowSize = windowHandler->getSize();
+
+    wormSize = sf::Vector2f(windowSize.x * 0.12f, windowSize.y * 0.12f); // размер червяка
+    distBetweenEnemies = wormSize.x * 4.f;                               // расстояние между мобами
+    wormsAmount = windowSize.x / distBetweenEnemies + 2;                 // макс кол-во червяков
+    wormTexture.loadFromFile("../Textures/worm.png");                    // текстуры червяка
+
+    batSize = sf::Vector2f(windowSize.x * 0.13f, windowSize.y * 0.16f); // размер мышей
+    batsAmount = windowSize.x / distBetweenEnemies + 2;                 // макс кол-во мышей
+    batTexture.loadFromFile("../Textures/bat.png");                     // текстуры летучей мыши
 }
 
-void Enemies::init()
+void Enemies::restart()
 {
-    auto windowSize = windowHandler->getSize();
     auto playerSize = playerHandler->model.getSize();
 
-    wormSize = sf::Vector2f(windowSize.x * 0.12f, windowSize.y * 0.12f);
-    distBetweenWorms = playerSize.x + wormSize.x;
-    wormsAmount = windowSize.x / distBetweenWorms + 2;
-
-    batSize = sf::Vector2f(windowSize.x * 0.13f, windowSize.y * 0.16f);
-    distBetweenBats = playerSize.x + batSize.x;
-    batsAmount = windowSize.x / distBetweenBats + 2;
-
-    uncheckedWorms.clear();
-    busyWorms.clear();
     worms.clear();
+    availableWorms.clear();
+    busyWorms.clear();
+    uncheckedWorms.clear();
 
     worms.reserve(wormsAmount);
-    unsigned textureID = 0;
     for (auto n = 0; n < wormsAmount; ++n)
     {
         AnimatedModel worm(windowHandler);
@@ -42,11 +42,12 @@ void Enemies::init()
         availableWorms.push_back(&worms[n]);
     }
 
-    uncheckedBats.clear();
-    busyBats.clear();
     bats.clear();
+    availableBats.clear();
+    busyBats.clear();
+    uncheckedBats.clear();
+
     bats.reserve(batsAmount);
-    textureID = 0;
     for (auto n = 0; n < batsAmount; ++n)
     {
         AnimatedModel bat(windowHandler);
@@ -60,37 +61,37 @@ void Enemies::init()
 
 void Enemies::draw()
 {
-    for (auto &groundEnemy : busyWorms)
-        groundEnemy->draw();
+    for (auto &worm : busyWorms)
+        worm->draw();
 
-    for (auto &flyingEnemy : busyBats)
-        flyingEnemy->draw();
+    for (auto &bat : busyBats)
+        bat->draw();
 }
 
 void Enemies::move(float x, float y)
 {
     for (auto it = busyWorms.begin(); it < busyWorms.end(); ++it)
     {
-        auto groundEnemyP = *it;
-        if (groundEnemyP->sprite.getPosition().x + groundEnemyP->getSize().x / 2 <= 0)
+        auto wormP = *it;
+        if (wormP->sprite.getPosition().x + wormP->getSize().x / 2 <= 0)
         {
-            availableWorms.push_back(groundEnemyP);
+            availableWorms.push_back(wormP);
             it = busyWorms.erase(it);
         }
         else
-            groundEnemyP->sprite.move(x, y);
+            wormP->sprite.move(x, y);
     }
 
     for (auto it = busyBats.begin(); it < busyBats.end(); ++it)
     {
-        auto flyingEnemyP = *it;
-        if (flyingEnemyP->sprite.getPosition().x + flyingEnemyP->getSize().x / 2 <= 0)
+        auto batP = *it;
+        if (batP->sprite.getPosition().x + batP->getSize().x / 2 <= 0)
         {
-            availableBats.push_back(flyingEnemyP);
+            availableBats.push_back(batP);
             it = busyBats.erase(it);
         }
         else
-            flyingEnemyP->sprite.move(x, y);
+            batP->sprite.move(x, y);
     }
 }
 
@@ -112,10 +113,10 @@ bool Enemies::spawn(float elapsedTime)
     {
         if (availableWorms.empty())
             return false;
-        auto &groundEnemy = *availableWorms.front();
+        auto &worm = *availableWorms.front();
         busyWorms.push_back(availableWorms.front());
         uncheckedWorms.push_back(availableWorms.front());
-        groundEnemy.sprite.setPosition(windowSize.x + groundEnemy.getSize().x / 2.f, groundHeight - groundEnemy.getSize().y / 2.0f);
+        worm.sprite.setPosition(windowSize.x + worm.getSize().x / 2.f, groundHeight - worm.getSize().y / 2.0f);
         availableWorms.pop_front();
     }
     else
@@ -123,23 +124,18 @@ bool Enemies::spawn(float elapsedTime)
         if (availableBats.empty())
             return false;
         auto playerSize = playerHandler->getRunningSize();
-        auto &flyingEnemy = *availableBats.front();
+        auto &bat = *availableBats.front();
         busyBats.push_back(availableBats.front());
         uncheckedBats.push_back(availableBats.front());
-        flyingEnemy.sprite.setPosition(windowSize.x + flyingEnemy.getSize().x / 2.f, groundHeight - playerSize.y / 2.f - flyingEnemy.getSize().y / 2.f);
+        bat.sprite.setPosition(windowSize.x + bat.getSize().x / 2.f, playerHandler->jumpHeight);
         availableBats.pop_front();
     }
     return true;
 }
 
-float Enemies::getWormDistance() const
+float Enemies::getBetweenDistance() const
 {
-    return distBetweenWorms;
-}
-
-float Enemies::getBatDistance() const
-{
-    return distBetweenBats;
+    return distBetweenEnemies;
 }
 
 void Enemies::setGroundHeight(float newground)
@@ -152,12 +148,6 @@ float Enemies::getGroundHeight() const
     return groundHeight;
 }
 
-void Enemies::setWindowHandler(sf::RenderWindow *windowH)
-{
-    windowHandler = windowH;
-    // обработать все модели размеры и прочее в соответствии с новым окном
-}
-
 sf::RenderWindow *Enemies::getWindowHandler()
 {
     return windowHandler;
@@ -167,40 +157,24 @@ bool Enemies::checkCrash() const
 {
     auto playerHitBox = playerHandler->model.sprite.getGlobalBounds();
     sf::FloatRect intersection;
-    // float yScale = playerHitBox.height * 0.1f;
-    // float xScale = playerHitBox.width * 0.1f;
-    // playerHitBox.left += xScale;
-    // playerHitBox.width -= xScale * 2;
-    // playerHitBox.top += yScale;
-    // playerHitBox.height -= yScale * 2;
 
     for (const auto &bat : busyBats)
     {
         auto batHitBox = bat->sprite.getGlobalBounds();
-        // yScale = batHitBox.height * 0.1f;
-        // xScale = batHitBox.width * 0.1f;
-        // batHitBox.left += xScale;
-        // batHitBox.width -= xScale * 2;
-        // batHitBox.top += yScale;
-        // batHitBox.height -= yScale * 2;
+        batHitBox.width *= 0.9f;
 
         playerHitBox.intersects(batHitBox, intersection);
-        if (intersection.width > playerHitBox.width * 0.1f or intersection.height > playerHitBox.height * 0.1f)
+        if (intersection.height > playerHitBox.height * 0.15f and intersection.width > playerHitBox.width * 0.1f)
             return true;
     }
 
     for (const auto &worm : busyWorms)
     {
         auto wormHitBox = worm->sprite.getGlobalBounds();
-        // yScale = wormHitBox.height * 0.1f;
-        // xScale = wormHitBox.width * 0.1f;
-        // wormHitBox.left += xScale;
-        // wormHitBox.width -= xScale * 2;
-        // wormHitBox.top += yScale;
-        // wormHitBox.height -= yScale * 2;
+        wormHitBox.width *= 0.9f;
 
         playerHitBox.intersects(wormHitBox, intersection);
-        if (intersection.width > playerHitBox.width * 0.1f or intersection.height > playerHitBox.height * 0.1f)
+        if (intersection.height > playerHitBox.height * 0.15f and intersection.width > playerHitBox.width * 0.1f)
             return true;
     }
     return false;
@@ -208,12 +182,12 @@ bool Enemies::checkCrash() const
 
 bool Enemies::checkOvercome()
 {
-    auto playerborder = playerHandler->model.sprite.getPosition().x - playerHandler->model.getSize().x / 2;
+    auto playerBorder = playerHandler->model.sprite.getPosition().x - playerHandler->model.getSize().x / 2;
     if (!uncheckedBats.empty())
     {
-        auto flying = uncheckedBats.front();
-        auto enemyborder = flying->sprite.getPosition().x + flying->getSize().x / 2;
-        if (enemyborder < playerborder)
+        auto bat = uncheckedBats.front();
+        auto enemyBorder = bat->sprite.getPosition().x + bat->getSize().x / 2;
+        if (enemyBorder < playerBorder)
         {
             uncheckedBats.pop_front();
             return true;
@@ -222,9 +196,9 @@ bool Enemies::checkOvercome()
 
     if (!uncheckedWorms.empty())
     {
-        auto ground = uncheckedWorms.front();
-        auto enemyborder = ground->sprite.getPosition().x + ground->getSize().x / 2;
-        if (enemyborder < playerborder)
+        auto worm = uncheckedWorms.front();
+        auto enemyBorder = worm->sprite.getPosition().x + worm->getSize().x / 2;
+        if (enemyBorder < playerBorder)
         {
             uncheckedWorms.pop_front();
             return true;
@@ -246,11 +220,11 @@ void Enemies::loadWormTexture(const sf::String &path)
 
 void Enemies::updateAnimations(float elapsedTime)
 {
-    for (auto &Enemy : busyWorms)
-        Enemy->updateAnimation(elapsedTime);
+    for (auto &worm : busyWorms)
+        worm->updateAnimation(elapsedTime);
 
-    for (auto &Enemy : busyBats)
-        Enemy->updateAnimation(elapsedTime);
+    for (auto &bat : busyBats)
+        bat->updateAnimation(elapsedTime);
 }
 
 void Enemies::setSpawnTimer(float value)
@@ -266,7 +240,7 @@ float Enemies::getSpawnTimer() const
 void Enemies::setMinSpawnInterval(float value)
 {
     minSpawnInterval = value;
-    spawnInterval = random.getFloat(minSpawnInterval, 2 * minSpawnInterval);
+    spawnInterval = random.getFloat(minSpawnInterval, 1.5f * minSpawnInterval);
 }
 
 float Enemies::getMinSpawnInterval() const
@@ -282,4 +256,14 @@ void Enemies::setSpawnInterval(float value)
 float Enemies::getSpawnInterval() const
 {
     return spawnInterval;
+}
+
+const sf::Vector2f &Enemies::getWormSize() const
+{
+    return wormSize;
+}
+
+const sf::Vector2f &Enemies::getBatSize() const
+{
+    return batSize;
 }
