@@ -100,13 +100,32 @@ void InfoText::setGeneralFont(const sf::Font &font)
     content.setFont(font);
 }
 
-void InfoText::setWindowHandler(sf::RenderWindow *windowH)
-{
-    windowHandler = windowH;
-    update();
-}
-
-sf::RenderWindow *InfoText::getWindowHandler()
+sf::RenderWindow *InfoText::getWindowHandler() const
 {
     return windowHandler;
+}
+
+sf::RectangleShape &InfoText::getBackground()
+{
+    return background;
+}
+
+sf::Text &InfoText::getTitle()
+{
+    return title;
+}
+
+sf::Text &InfoText::getContent()
+{
+    return content;
+}
+
+void InfoText::setActive(bool status)
+{
+    isActive = status;
+}
+
+bool InfoText::getActive() const
+{
+    return isActive;
 }

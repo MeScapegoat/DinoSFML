@@ -15,17 +15,50 @@ public:
     ~Player() = default;
 
 public:
+    void draw();
     void move(float);
     void jump();
 
     void loadTexture(const std::string &);
 
+    void accelerate();
+
+    // setters/getters
+public:
     void setSliding(bool);
 
     const sf::Vector2f &getRunningSize() const;
     const sf::Vector2f &getSlidingSize() const;
+    sf::Vector2f getSize() const;
 
-public:
+    const sf::Vector2f &getPosition() const;
+
+    void setPosition(float, float);
+    void setPosition(const sf::Vector2f &);
+
+    sf::FloatRect getGlobalBounds() const;
+    sf::FloatRect getLocalBounds() const;
+
+    sf::RenderWindow *getWindowHandler() const;
+
+    void setJumpVelocity(float);
+    float getJumpVelocity() const;
+
+    void setJumpAcceleration(float);
+    float getJumpAcceleration() const;
+
+    void setMaxJumpVelocity(float);
+    float getMaxJumpVelocity() const;
+
+    void setJumpHeight(float);
+    float getJumpHeight() const;
+
+    void setGroundLevel(float);
+    float getGroundLevel() const;
+
+    void resetJumpState();
+
+private:
     float jumpVelocity{0};     // скорость прыжка (также скорость падения)
     float jumpAcceleration{0}; // ускорение прыжка
     float maxJumpVelocity{0};  // максимальная скорость прыжка
@@ -35,7 +68,6 @@ public:
 
     AnimatedModel model;
 
-private:
     AnimationInfo run;
     AnimationInfo slide;
 

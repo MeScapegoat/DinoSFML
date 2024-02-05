@@ -54,3 +54,43 @@ sf::Vector2f Model::getScale() const
     auto scale = sprite.getScale();
     return {scale.x / normalScale.x, scale.y / normalScale.y};
 }
+
+sf::RenderWindow *Model::getWindowHandler() const
+{
+    return windowHandler;
+}
+
+const sf::Vector2f &Model::getPosition() const
+{
+    return sprite.getPosition();
+}
+
+void Model::setPosition(float x, float y)
+{
+    sprite.setPosition(x, y);
+}
+
+void Model::setPosition(const sf::Vector2f &pos)
+{
+    sprite.setPosition(pos);
+}
+
+sf::FloatRect Model::getGlobalBounds() const
+{
+    return sprite.getGlobalBounds();
+}
+
+sf::FloatRect Model::getLocalBounds() const
+{
+    return sprite.getLocalBounds();
+}
+
+void Model::move(float x, float y)
+{
+    sprite.move(x, y);
+}
+
+void Model::move(const sf::Vector2f &offset)
+{
+    sprite.move(offset);
+}

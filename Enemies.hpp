@@ -1,10 +1,10 @@
 #pragma once
+#include <vector>
+#include <deque>
+
 #include "AnimatedModel.hpp"
 #include "Player.hpp"
 #include "Randomizer.hpp"
-
-#include <vector>
-#include <deque>
 
 class Enemies
 {
@@ -13,32 +13,40 @@ public:
     ~Enemies() = default;
 
 public:
+    Enemies(const Enemies &) = delete;
+    Enemies(Enemies &&) = delete;
+    Enemies &operator=(const Enemies &) = delete;
+    Enemies &operator=(Enemies &&) = delete;
+
+public:
     void restart();
 
     void draw();
+
     void move(float, float);
     void move(const sf::Vector2f &);
 
     bool spawn(float);
 
-public:
     void loadBatTexture(const sf::String &);
     void loadWormTexture(const sf::String &);
-
-    float getBetweenDistance() const;
-
-    void setGroundHeight(float);
-    float getGroundHeight() const;
-
-    void setPlayerHandler(Player *);
-    Player *getPlayerHandler();
-
-    sf::RenderWindow *getWindowHandler();
 
     bool checkCrash() const;
     bool checkOvercome();
 
     void updateAnimations(float);
+
+    // setters/getters
+public:
+    sf::RenderWindow *getWindowHandler();
+
+    float getBetweenDistance() const;
+
+    void setPlayerHandler(Player *);
+    Player *getPlayerHandler();
+
+    void setGroundHeight(float);
+    float getGroundHeight() const;
 
     void setSpawnTimer(float);
     float getSpawnTimer() const;

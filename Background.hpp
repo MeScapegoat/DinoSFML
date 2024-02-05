@@ -23,6 +23,11 @@ public:
     void move(float, float);
     void move(const sf::Vector2f &);
 
+    void loadCloudTexture(const sf::String &);
+    void loadTreeTexture(const sf::String &);
+
+    // setters/getters
+public:
     void setCloudsAmount(int);
     int getCloudsAmount() const;
 
@@ -39,10 +44,7 @@ public:
 
     float getGround() const;
 
-    void loadCloudTexture(const sf::String &);
-    void loadTreeTexture(const sf::String &);
-
-    sf::RenderWindow *getWindowHandler();
+    sf::RenderWindow *getWindowHandler() const;
 
 private:
     sf::RenderWindow *windowHandler{nullptr};

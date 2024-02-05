@@ -17,7 +17,9 @@ public:
 
 public:
     AnimationInfo(const AnimationInfo &) = default;
+    AnimationInfo(AnimationInfo &&) = default;
     AnimationInfo &operator=(const AnimationInfo &) = default;
+    AnimationInfo &operator=(AnimationInfo &&) = default;
 
 public:
     sf::Vector2i start; // Начальные координаты текстуры в TextureSheet
@@ -36,10 +38,18 @@ public:
     ~AnimatedModel() = default;
 
 public:
+    AnimatedModel(const AnimatedModel &) = default;
+    AnimatedModel(AnimatedModel &&) = default;
+    AnimatedModel &operator=(const AnimatedModel &) = default;
+    AnimatedModel &operator=(AnimatedModel &&) = default;
+
+public:
+    void updateAnimation(float);
+
+    // setters/getters
+public:
     void setCurrentAnimation(const AnimationInfo &);
     const AnimationInfo &getCurrentAnimation() const;
-
-    void updateAnimation(float);
 
     void setSize(float x, float y) override;
     void setSize(const sf::Vector2f &) override;

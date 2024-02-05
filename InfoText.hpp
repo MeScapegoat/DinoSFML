@@ -9,9 +9,18 @@ public:
     ~InfoText() = default;
 
 public:
+    InfoText(const InfoText &) = delete;
+    InfoText(InfoText &&) = delete;
+    InfoText &operator=(const InfoText &) = delete;
+    InfoText &operator=(InfoText &&) = delete;
+
+public:
     void update();
 
     void draw();
+
+    // setters/getters
+public:
     void setPosition(float, float);
     void setPosition(const sf::Vector2f &);
 
@@ -20,13 +29,17 @@ public:
 
     void setGeneralFont(const sf::Font &);
 
-    void setWindowHandler(sf::RenderWindow *);
-    sf::RenderWindow *getWindowHandler();
+    sf::RenderWindow *getWindowHandler() const;
+
+    sf::RectangleShape &getBackground();
+    sf::Text &getTitle();
+    sf::Text &getContent();
+
+    void setActive(bool);
+    bool getActive() const;
 
 private:
     sf::RenderWindow *windowHandler{nullptr};
-
-public:
     sf::RectangleShape background; // фон
     sf::Text title;                // заголовок
     sf::Text content;              // содержательный текст

@@ -28,20 +28,25 @@ Player::Player(sf::RenderWindow *windowH) : model(windowH),
     slideSound.setPitch(3.f);
 }
 
+void Player::draw()
+{
+    model.draw();
+}
+
 void Player::move(float elapsedTime)
 {
     if (isSliding)
         return;
 
     model.updateAnimation(elapsedTime);
-    auto pos = model.sprite.getPosition().y;
+    auto pos = getPosition().y;
 
-    if (jumpState < 0 and pos <= jumpHeight - model.getSize().y / 2)
+    if (jumpState < 0 and pos <= jumpHeight - getSize().y / 2)
         jumpState = 1;
-    else if (jumpState > 0 and pos >= groundLevel - model.getSize().y / 2)
+    else if (jumpState > 0 and pos >= groundLevel - getSize().y / 2)
         jumpState = 0;
 
-    model.sprite.move(sf::Vector2f(0, jumpVelocity * jumpState * elapsedTime));
+    model.move(0, jumpVelocity * jumpState * elapsedTime);
 }
 
 void Player::jump()
@@ -60,6 +65,11 @@ void Player::loadTexture(const std::string &path)
     model.setTexture(texture);
 }
 
+void Player::accelerate()
+{
+    jumpVelocity += jumpAcceleration;
+}
+
 void Player::setSliding(bool flag)
 {
     if (flag == isSliding) // нет смысла ставить уже активный флаг
@@ -75,7 +85,7 @@ void Player::setSliding(bool flag)
         model.setCurrentAnimation(slide);
         model.setSize(slidingSize);
 
-        model.sprite.setPosition(model.sprite.getPosition().x, groundLevel - model.getSize().y * 0.3);
+        setPosition(getPosition().x, groundLevel - getSize().y * 0.3);
     }
     else
     {
@@ -83,7 +93,7 @@ void Player::setSliding(bool flag)
         model.setCurrentAnimation(run);
         model.setSize(runningSize);
 
-        model.sprite.setPosition(model.sprite.getPosition().x, groundLevel - model.getSize().y * 0.5);
+        setPosition(getPosition().x, groundLevel - getSize().y * 0.5);
     }
 }
 
@@ -95,4 +105,93 @@ const sf::Vector2f &Player::getRunningSize() const
 const sf::Vector2f &Player::getSlidingSize() const
 {
     return slidingSize;
+}
+
+sf::Vector2f Player::getSize() const
+{
+    return model.getSize();
+}
+
+const sf::Vector2f &Player::getPosition() const
+{
+    return model.getPosition();
+}
+
+void Player::setPosition(float x, float y)
+{
+    model.setPosition(x, y);
+}
+void Player::setPosition(const sf::Vector2f &pos)
+{
+    model.setPosition(pos);
+}
+
+sf::FloatRect Player::getGlobalBounds() const
+{
+    return model.getGlobalBounds();
+}
+
+sf::FloatRect Player::getLocalBounds() const
+{
+    return model.getLocalBounds();
+}
+
+sf::RenderWindow *Player::getWindowHandler() const
+{
+    return model.getWindowHandler();
+}
+
+void Player::setJumpVelocity(float v)
+{
+    jumpVelocity = v;
+}
+
+float Player::getJumpVelocity() const
+{
+    return jumpVelocity;
+}
+
+void Player::setJumpAcceleration(float a)
+{
+    jumpAcceleration = a;
+}
+
+float Player::getJumpAcceleration() const
+{
+    return jumpAcceleration;
+}
+
+void Player::setMaxJumpVelocity(float mv)
+{
+    maxJumpVelocity = mv;
+}
+
+float Player::getMaxJumpVelocity() const
+{
+    return maxJumpVelocity;
+}
+
+void Player::setJumpHeight(float h)
+{
+    jumpHeight = h;
+}
+
+float Player::getJumpHeight() const
+{
+    return jumpHeight;
+}
+
+void Player::setGroundLevel(float g)
+{
+    groundLevel = g;
+}
+
+float Player::getGroundLevel() const
+{
+    return groundLevel;
+}
+
+void Player::resetJumpState()
+{
+    jumpState = 0;
 }

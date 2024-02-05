@@ -15,8 +15,11 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
       background(&window),
       player(&window),
       enemies(&window, &player),
+      isPaused(true),
       isGameOver(false)
 {
+    const InfoText bg(&window);
+    auto wh = bg.getWindowHandler();
     const auto &size = window.getSize();
 
     font.loadFromFile("../fonts/HERO.ttf");
@@ -37,8 +40,7 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
                                 L"Нажми Z чтобы выйти");
     gameOverText.setPosition(size.x / 2, size.y * 0.4f);
 
-    isPaused = true;
-    pausedText.isActive = true;
+    pausedText.setActive(true);
 
     soundtrack.openFromFile("../Sound/Toys - Hunter Milo.ogg"); // Говорят что это Copyright free
     soundtrack.setLoopPoints({sf::seconds(1.7f), sf::seconds(6.f)});
@@ -47,7 +49,7 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     soundtrack.setVolume(30);
 
     enemies.setGroundHeight(background.getGround());
-    player.groundLevel = background.getGround();
+    player.setGroundLevel(background.getGround());
     scoreboard.setCharacterSize(size.y - background.getGround());
     scoreboard.setOrigin(0, scoreboard.getCharacterSize());
     scoreboard.setPosition(0, size.y * 0.99f);
@@ -56,13 +58,12 @@ Game::Game(sf::VideoMode mode, const sf::String &title, uint32_t style)
     worldVelocity = 200;
     worldAcceleration = (maxWorldVelocity - worldVelocity) / 100;
 
-    player.jumpVelocity = worldVelocity / 1.5f;
-    player.maxJumpVelocity = maxWorldVelocity / 1.5f;
-    player.jumpAcceleration = (player.maxJumpVelocity - player.jumpVelocity) / 100;
+    player.setJumpVelocity(worldVelocity / 1.5f);
+    player.setMaxJumpVelocity(maxWorldVelocity / 1.5f);
+    player.setJumpAcceleration((player.getMaxJumpVelocity() - player.getJumpVelocity()) / 100);
+    player.setJumpHeight(player.getGroundLevel() - enemies.getWormSize().y * 2);
 
     restart();
-
-    player.jumpHeight = player.groundLevel - enemies.getWormSize().y * 2;
 }
 
 void Game::restart()
@@ -74,9 +75,9 @@ void Game::restart()
     elapsedTime = 0;
 
     const auto &size = window.getSize();
-    player.model.sprite.setPosition(size.x * 0.15f + player.model.getSize().x / 2,
-                                    background.getGround() - player.model.getSize().y / 2);
-    player.jumpVelocity = worldVelocity / 1.5f;
+    player.setPosition(size.x * 0.15f + player.getSize().x / 2,
+                       background.getGround() - player.getSize().y / 2);
+    player.setJumpVelocity(worldVelocity / 1.5f);
 
     enemies.setMinSpawnInterval(enemies.getBetweenDistance() / worldVelocity);
     scoreboard.setScore(0);
@@ -91,7 +92,7 @@ void Game::render()
     scoreboard.draw();
 
     enemies.draw();
-    player.model.draw();
+    player.draw();
 
     pausedText.draw();
     gameOverText.draw();
@@ -121,11 +122,12 @@ void Game::update()
                 {
                     restart();
                     isGameOver = false;
-                    gameOverText.isActive = false;
+                    gameOverText.setActive(false);
+                    player.resetJumpState();
                     break;
                 }
                 isPaused = !isPaused;
-                pausedText.isActive = !pausedText.isActive;
+                pausedText.setActive(!pausedText.getActive());
                 break;
             case sf::Keyboard::W:
             case sf::Keyboard::Up:
@@ -160,7 +162,7 @@ void Game::update()
     if (enemies.checkCrash())
     {
         isGameOver = true;
-        gameOverText.isActive = true;
+        gameOverText.setActive(true);
         return;
     }
 
@@ -173,7 +175,7 @@ void Game::update()
         if (worldVelocity < maxWorldVelocity)
         {
             worldVelocity += worldAcceleration;
-            player.jumpVelocity += player.jumpAcceleration;
+            player.accelerate();
         }
     }
     enemies.updateAnimations(elapsedTime);

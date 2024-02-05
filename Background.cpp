@@ -16,7 +16,7 @@ Background::Background(sf::RenderWindow *windowH) : windowHandler(windowH)
     cloudTexture.loadFromFile("../Textures/cloud.png");              // Текстура облака
 
     setTreesAmount(5);                                             // кол-во деревьев
-    setTreeSize(sf::Vector2f(size.x * 0.18f, size.y * 0.55f));     // размер деревьев
+    setTreeSize(sf::Vector2f(size.x * 0.2f, size.y * 0.55f));      // размер деревьев
     distBetweenTrees.x = static_cast<float>(size.x) / treesAmount; // расстояние между деревьями
     treeTexture.loadFromFile("../Textures/tree.png");              // Текстура дерева
 
@@ -38,21 +38,23 @@ void Background::restart()
         Model tree(windowHandler);
         tree.setTexture(treeTexture);
         tree.setSize(treeSize);
-        tree.sprite.setPosition(nextTreePosition);
+        tree.setPosition(nextTreePosition);
         nextTreePosition += distBetweenTrees;
         trees.push_back(std::move(tree));
     }
 
     clouds.clear();
     clouds.reserve(cloudsAmount + 1);
+    if (distBetweenClouds.y < 0)
+        distBetweenClouds.y *= -1;
     nextCloudPosition = sf::Vector2f(cloudSize.x / 2,
-                                     trees[0].sprite.getPosition().y - trees[0].getSize().y / 2 - cloudSize.y / 2 - distBetweenClouds.y * 1.5f);
+                                     nextTreePosition.y - treeSize.y / 2 - cloudSize.y / 2 - distBetweenClouds.y * 1.5f);
     for (auto n = 0; n < cloudsAmount + 1; ++n)
     {
         Model cloud(windowHandler);
         cloud.setTexture(cloudTexture);
         cloud.setSize(cloudSize);
-        cloud.sprite.setPosition(nextCloudPosition);
+        cloud.setPosition(nextCloudPosition);
         nextCloudPosition += distBetweenClouds;
         distBetweenClouds.y *= -1;
         clouds.push_back(std::move(cloud));
@@ -61,9 +63,11 @@ void Background::restart()
 
 void Background::draw()
 {
-    windowHandler->clear(sf::Color(120, 210, 255)); // цвет фона
     if (!windowHandler)
         return;
+
+    windowHandler->clear(sf::Color(120, 210, 255)); // цвет фона
+
     for (auto &cloud : clouds)
         cloud.draw();
 
@@ -84,11 +88,11 @@ void Background::move(const sf::Vector2f &offset)
     nextTreePosition += offset;
     for (auto &cloud : clouds)
     {
-        if (cloud.sprite.getPosition().x + cloud.getSize().x / 2 > 0)
-            cloud.sprite.move(offset);
+        if (cloud.getPosition().x + cloud.getSize().x / 2 > 0)
+            cloud.move(offset);
         else
         {
-            cloud.sprite.setPosition(nextCloudPosition);
+            cloud.setPosition(nextCloudPosition);
             nextCloudPosition += distBetweenClouds;
             distBetweenClouds.y *= -1;
         }
@@ -96,11 +100,11 @@ void Background::move(const sf::Vector2f &offset)
 
     for (auto &tree : trees)
     {
-        if (tree.sprite.getPosition().x + tree.getSize().x / 2 > 0)
-            tree.sprite.move(offset);
+        if (tree.getPosition().x + tree.getSize().x / 2 > 0)
+            tree.move(offset);
         else
         {
-            tree.sprite.setPosition(nextTreePosition);
+            tree.setPosition(nextTreePosition);
             nextTreePosition += distBetweenTrees;
         }
     }
@@ -171,7 +175,7 @@ void Background::loadTreeTexture(const sf::String &file)
     treeTexture.loadFromFile(file);
 }
 
-sf::RenderWindow *Background::getWindowHandler()
+sf::RenderWindow *Background::getWindowHandler() const
 {
     return windowHandler;
 }

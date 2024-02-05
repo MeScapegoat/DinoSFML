@@ -3,8 +3,6 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "Enemies.hpp"
 
-#include <iostream>
-
 Enemies::Enemies(sf::RenderWindow *windowH, Player *playerH) : windowHandler(windowH), playerHandler(playerH),
                                                                wormAnim({0, 0}, 2, 0.5f),
                                                                batAnim({0, 0}, 2, 0.5f)
@@ -17,15 +15,13 @@ Enemies::Enemies(sf::RenderWindow *windowH, Player *playerH) : windowHandler(win
     wormsAmount = windowSize.x / distBetweenEnemies + 2;                 // макс кол-во червяков
     wormTexture.loadFromFile("../Textures/worm.png");                    // текстуры червяка
 
-    batSize = sf::Vector2f(windowSize.x * 0.13f, windowSize.y * 0.16f); // размер мышей
-    batsAmount = windowSize.x / distBetweenEnemies + 2;                 // макс кол-во мышей
-    batTexture.loadFromFile("../Textures/bat.png");                     // текстуры летучей мыши
+    batSize = sf::Vector2f(windowSize.x * 0.10f, windowSize.y * 0.2f); // размер мышей
+    batsAmount = windowSize.x / distBetweenEnemies + 2;                // макс кол-во мышей
+    batTexture.loadFromFile("../Textures/bat.png");                    // текстуры летучей мыши
 }
 
 void Enemies::restart()
 {
-    auto playerSize = playerHandler->model.getSize();
-
     worms.clear();
     availableWorms.clear();
     busyWorms.clear();
@@ -73,25 +69,25 @@ void Enemies::move(float x, float y)
     for (auto it = busyWorms.begin(); it < busyWorms.end(); ++it)
     {
         auto wormP = *it;
-        if (wormP->sprite.getPosition().x + wormP->getSize().x / 2 <= 0)
+        if (wormP->getPosition().x + wormP->getSize().x / 2 <= 0)
         {
             availableWorms.push_back(wormP);
             it = busyWorms.erase(it);
         }
         else
-            wormP->sprite.move(x, y);
+            wormP->move(x, y);
     }
 
     for (auto it = busyBats.begin(); it < busyBats.end(); ++it)
     {
         auto batP = *it;
-        if (batP->sprite.getPosition().x + batP->getSize().x / 2 <= 0)
+        if (batP->getPosition().x + batP->getSize().x / 2 <= 0)
         {
             availableBats.push_back(batP);
             it = busyBats.erase(it);
         }
         else
-            batP->sprite.move(x, y);
+            batP->move(x, y);
     }
 }
 
@@ -116,7 +112,7 @@ bool Enemies::spawn(float elapsedTime)
         auto &worm = *availableWorms.front();
         busyWorms.push_back(availableWorms.front());
         uncheckedWorms.push_back(availableWorms.front());
-        worm.sprite.setPosition(windowSize.x + worm.getSize().x / 2.f, groundHeight - worm.getSize().y / 2.0f);
+        worm.setPosition(windowSize.x + worm.getSize().x / 2.f, groundHeight - worm.getSize().y / 2.0f);
         availableWorms.pop_front();
     }
     else
@@ -127,7 +123,7 @@ bool Enemies::spawn(float elapsedTime)
         auto &bat = *availableBats.front();
         busyBats.push_back(availableBats.front());
         uncheckedBats.push_back(availableBats.front());
-        bat.sprite.setPosition(windowSize.x + bat.getSize().x / 2.f, playerHandler->jumpHeight);
+        bat.setPosition(windowSize.x + bat.getSize().x / 2.f, playerHandler->getJumpHeight());
         availableBats.pop_front();
     }
     return true;
@@ -155,12 +151,12 @@ sf::RenderWindow *Enemies::getWindowHandler()
 
 bool Enemies::checkCrash() const
 {
-    auto playerHitBox = playerHandler->model.sprite.getGlobalBounds();
+    auto playerHitBox = playerHandler->getGlobalBounds();
     sf::FloatRect intersection;
 
     for (const auto &bat : busyBats)
     {
-        auto batHitBox = bat->sprite.getGlobalBounds();
+        auto batHitBox = bat->getGlobalBounds();
         batHitBox.width *= 0.9f;
 
         playerHitBox.intersects(batHitBox, intersection);
@@ -170,7 +166,7 @@ bool Enemies::checkCrash() const
 
     for (const auto &worm : busyWorms)
     {
-        auto wormHitBox = worm->sprite.getGlobalBounds();
+        auto wormHitBox = worm->getGlobalBounds();
         wormHitBox.width *= 0.9f;
 
         playerHitBox.intersects(wormHitBox, intersection);
@@ -182,11 +178,11 @@ bool Enemies::checkCrash() const
 
 bool Enemies::checkOvercome()
 {
-    auto playerBorder = playerHandler->model.sprite.getPosition().x - playerHandler->model.getSize().x / 2;
+    auto playerBorder = playerHandler->getPosition().x - playerHandler->getSize().x / 2;
     if (!uncheckedBats.empty())
     {
         auto bat = uncheckedBats.front();
-        auto enemyBorder = bat->sprite.getPosition().x + bat->getSize().x / 2;
+        auto enemyBorder = bat->getPosition().x + bat->getSize().x / 2;
         if (enemyBorder < playerBorder)
         {
             uncheckedBats.pop_front();
@@ -197,7 +193,7 @@ bool Enemies::checkOvercome()
     if (!uncheckedWorms.empty())
     {
         auto worm = uncheckedWorms.front();
-        auto enemyBorder = worm->sprite.getPosition().x + worm->getSize().x / 2;
+        auto enemyBorder = worm->getPosition().x + worm->getSize().x / 2;
         if (enemyBorder < playerBorder)
         {
             uncheckedWorms.pop_front();
